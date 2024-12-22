@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+</head>
+<body>
+    <form action="/register" class="container" method="post">
+        <h2 style="text-align: center;"><b>Registration</b></h2> <!-- Scritta Registration in grassetto e centrata -->
+        
+        <div class="input-container">
+            <img src="{{ url_for('static', filename='user_icon.png') }}" alt="User Icon" style="width:30px;height:30px;">
+            <input type="text" placeholder="First Name" name="fname" required>
+        </div>
+        
+        <div class="input-container">
+            <img src="{{ url_for('static', filename='user_icon.png') }}" alt="User Icon" style="width:30px;height:30px;">
+            <input type="text" placeholder="Last Name" name="lname" required>
+        </div>
+        
+        <div class="input-container">
+            <img src="{{ url_for('static', filename='email.png') }}" alt="Email Icon" style="width:30px;height:30px;">
+            <input type="email" placeholder="Email" name="email" required>
+        </div>
+        
+        <div class="input-container">
+            <img src="{{ url_for('static', filename='lock_icon.png') }}" alt="Lock Icon" style="width:30px;height:30px;">
+            <input type="password" placeholder="Password" name="psw" required>
+        </div>
+        
+        <button type="submit" class="btn">Register</button>
+        <a href="#" style="float: right;">Forgot password?</a><br>
+
+        <div style="margin-top: 20px;">
+            <a href="https://www.facebook.com"><img src="{{ url_for('static', filename='facebook_icon.png') }}" alt="Facebook Icon" style="width:30px;height:30px;"></a>
+            <a href="https://www.twitter.com"><img src="{{ url_for('static', filename='twitter_icon.png') }}" alt="Twitter Icon" style="width:30px;height:30px;"></a>
+            <a href="https://www.google.com"><img src="{{ url_for('static', filename='google_icon.png') }}" alt="Google Icon" style="width:30px;height:30px;"></a>
+        </div>
+        
+        <button type="button" class="btn" style="margin-top: 20px;">Already have an account?</button>
+        <button type="button" class="btn" style="margin-top: 20px;">Exit</button>
+    </form>
+</body>
+</html>

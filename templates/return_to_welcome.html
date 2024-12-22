@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome Back to Ponte's Casino</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    audio#background-music {
+        display: none;
+    }
+  </style>
+</head>
+<body>
+    <h1>Ponte's Casinò</h1>
+    <a class="play-button" href="{{ url_for('casino_home') }}">Play</a>
+    <audio id="background-music" src="{{ url_for('static', filename='Musica_per_il_Poker/Invisible Cities.mp3') }}" controls loop hidden autoplay></audio>
+    <div class="info-creator">
+        <h2>Information About the Creator</h2>
+        <p><a href="https://instagram.com/lucapontellini_?igshid=OGQ5ZDc2ODk2ZA%3D%3D&utm_source=qr">First Instagram account</a></p>
+        <p><a href="https://instagram.com/plastici.f3rroviari?igshid=NGVhN2U2NjQ0Yg%3D%3D&utm_source=qr">Second Instagram account</a></p>
+        <p><a href="https://youtube.com/@plastici.ferroviari?si=wkOH-Bw3nANmbl_D">YouTube Channel</a></p>
+        <p><a href="https://github.com/LucaPontellini">GitHub Profile</a></p>
+    </div>
+
+    <script>
+        // Funzione per avviare la musica
+        function playBackgroundMusic() {
+            var backgroundMusic = document.getElementById('background-music');
+            if (backgroundMusic.paused) {
+                backgroundMusic.play();
+            }
+        }
+
+        // Avvia la musica quando la pagina viene caricata
+        window.addEventListener('load', playBackgroundMusic);
+
+        // Rileva quando l'utente torna indietro e riprende la riproduzione della musica
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                playBackgroundMusic();
+            }
+        });
+    </script>
+</body>
+</html>
