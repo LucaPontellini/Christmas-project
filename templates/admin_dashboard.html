@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    <table>
+        <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Balance</th>
+        </tr>
+        {% for user_id, user_info in users.items() %}
+        <tr>
+            <td>{{ user_id }}</td>
+            <td>{{ user_info['name'] }}</td>
+            <td>{{ user_info['email'] }}</td>
+            <td>{{ user_info['balance'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="chart-container">
+        <canvas id="earningsChart"></canvas>
+    </div>
+    
+    <div class="chart-container">
+        <canvas id="registrationsChart"></canvas>
+    </div>
+    
+    <script>
+        fetch('{{ url_for('earnings_json') }}')
+            .then(response => response.json())
+            .then(data => {
+                const months = Object.keys(data);
+                const earnings = Object.values(data);
+
+                const config = {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Casino Earnings ($)',
+                            data: earnings,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Months'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Earnings ($)'
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const earningsChart = new Chart(
+                    document.getElementById('earningsChart'),
+                    config
+                );
+            })
+            .catch(error => console.error('Error loading the JSON data:', error));
+
+        fetch('{{ url_for('registrations_json') }}')
+            .then(response => response.json())
+            .then(data => {
+                const months = Object.keys(data);
+                const registrations = Object.values(data);
+
+                const config = {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Casino Registrations',
+                            data: registrations,
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Months'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Registrations'
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const registrationsChart = new Chart(
+                    document.getElementById('registrationsChart'),
+                    config
+                );
+            })
+            .catch(error => console.error('Error loading the JSON data:', error));
+    </script>
+</body>
+</html>

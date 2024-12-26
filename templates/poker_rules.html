@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Poker Rules</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/poker_rules.css') }}">
+    </head>
+<body>
+
+<h1>Poker Rules</h1>
+
+<button class="casino-button"onclick="window.location.href='/casino_home'">Go to Casino Home</button>
+<button class="casino-button" onclick="window.location.href='/home_poker'">Go to Poker</button>
+
+<table>
+  <tr>
+    <th>Rule</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>Card Values</td>
+    <td>
+      Cards are ranked in ascending order: 2, 3, 4, 5, 6, 7, 8, 9, 10, Jack (J), Queen (Q), King (K), Ace (A).<br>
+      The Ace can be worth either 1 or 14, so the possible straights are:
+      <ul>
+        <li>Lowest Straight: Ace (1), 2, 3, 4, 5</li>
+        <li>Highest Straight: 10, Jack (J), Queen (Q), King (K), Ace (14)</li>
+      </ul>
+      The four suits are hearts (♥), diamonds (♦), clubs (♣), and spades (♠).
+      <br>
+      <!-- Carte di cuori -->
+      <p>Hearts (♥):</p>
+      <img src="/static/card_images/hearts/01_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/02_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/03_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/04_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/05_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/06_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/07_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/08_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/09_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/10_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/11_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/12_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <img src="/static/card_images/hearts/13_hearts.png?raw=true" alt="Card of Hearts" width="100">
+      <br>
+      <!-- Carte di quadri -->
+      <p>Diamonds (♦):</p>
+      <img src="/static/card_images/diamonds/01_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/02_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/03_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/04_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/05_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/06_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/07_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/08_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/09_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/10_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/11_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/12_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <img src="/static/card_images/diamonds/13_diamonds.png?raw=true" alt="Card of Diamonds" width="100">
+      <br>
+      <p>Clubs (♣):</p>
+      <!-- Carte di fiori -->
+      <img src="/static/card_images/clubs/01_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/02_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/03_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/04_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/05_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/06_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/07_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/08_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/09_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/10_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/11_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/12_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <img src="/static/card_images/clubs/13_clubs.png?raw=true" alt="Card of Flowers" width="100">
+      <br>
+      <p>Spades (♠):</p>
+      <!-- Carte di picche -->
+      <img src="/static/card_images/spades/01_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/02_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/03_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/04_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/05_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/06_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/07_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/08_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/09_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/10_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/11_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/12_spades.png?raw=true" alt="Card of Spades" width="100">
+      <img src="/static/card_images/spades/13_spades.png?raw=true" alt="Card of Spades" width="100">
+      <br>
+    </td>
+  </tr>
+  <tr>
+    <td>Hand Rankings</td>
+    <td>
+      <ul>
+        <li>Pair: Two cards of the same value.</li>
+        <li>Two Pair: Two sets of pairs.</li>
+        <li>Three of a Kind: Three cards of the same value.</li>
+        <li>Straight: Five consecutive cards (e.g., 2-3-4-5-6).</li>
+        <li>Flush: Five cards of the same suit.</li>
+        <li>Full House: One pair plus a three of a kind.</li>
+        <li>Four of a Kind: Four cards of the same value.</li>
+        <li>Straight Flush: Straight of the same suit from ace to ten.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td>Dealing of Cards</td>
+    <td>Each player receives two face-down cards (the "hole cards"). This is followed by a betting phase.</td>
+  </tr>
+  <tr>
+    <td>Betting</td>
+    <td>
+      <ul>
+        <li>Check: Pass the turn without betting.</li>
+        <li>Bet: Wager a certain number of chips.</li>
+        <li>Call: Match another player's bet.</li>
+        <li>Raise: Increase the bet.</li>
+        <li>Fold: Surrender the hand.</li>
+      </ul>
+      Three face-up cards are then dealt on the table (the "flop"). Two more face-up cards are dealt one at a time (the "turn" and the "river"). Players aim to form the best possible hand using their hole cards and the community cards on the table.
+    </td>
+  </tr>
+  <tr>
+    <td>Winner</td>
+    <td>At the end of the betting round, players reveal their cards. The player with the highest-ranking hand according to the above classification wins.</td>
+  </tr>
+</table>
+</body>
+</html>

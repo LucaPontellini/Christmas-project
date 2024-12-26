@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashier Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cashier_dashboard.css') }}">
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="content-wrapper">
+        <h1>Cashier Dashboard</h1>
+        <p>Total Money: {{ total_money }}</p>
+        <p>Remaining Money: {{ remaining_money }}</p>
+
+        <section>
+            <h2>Convert to Chips</h2>
+            <form action="{{ url_for('convert_to_chips') }}" method="post">
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" name="amount" required>
+                
+                <label for="chip-color">Chip Color:</label>
+                <select id="chip-color" name="chip-color" required>
+                    {% for color, value in value_of_chips.items() %}
+                        <option value="{{ color }}">{{ color }} ({{ value }})</option>
+                    {% endfor %}
+                </select>
+                
+                <input type="submit" value="Convert">
+            </form>
+        </section>
+
+        <section>
+            <h2>Update Balance</h2>
+            <form action="{{ url_for('update_balance') }}" method="post">
+                <label for="total_money">Total Money:</label>
+                <input type="number" id="total_money" name="total_money" required>
+                <input type="submit" value="Update">
+            </form>
+        </section>
+
+        <section>
+            <h2>Reconvert Chips to Money</h2>
+            <form action="{{ url_for('reconvert') }}" method="post">
+                <input type="submit" value="Reconvert">
+            </form>
+        </section>
+
+        <section>
+            <h2>Clear All Data</h2>
+            <form action="{{ url_for('clear_all_data') }}" method="post">
+                <input type="submit" value="Clear">
+            </form>
+        </section>
+
+        <button type="button" onclick="window.location.href='{{ url_for('casino_home') }}'">Exit</button>
+    </div>
+</body>
+</html>
