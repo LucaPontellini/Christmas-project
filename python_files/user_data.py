@@ -1,11 +1,10 @@
 import json
 import os
 import hashlib
-import matplotlib.pyplot as plt
 
 class UserData:
     def __init__(self, user_file_path):
-        self.user_file_path = os.path.join('json', user_file_path)
+        self.user_file_path = os.path.join('\\Christmas-project\\json', user_file_path)
         self.data = self.load_data()
 
     def load_data(self):
@@ -47,10 +46,11 @@ class UserData:
         self.data["users"][user_id] = {
             'name': name,
             'balance': balance,
-            'total_money': 0,
-            'remaining_money': 0,
+            'total_money': balance,
+            'remaining_money': balance,
             'email': email,
             'password': hashed_password,
+            'payment_method': None,  # Imposta il metodo di pagamento a None inizialmente
             'wins_losses': {}
         }
         self.save_data()
@@ -114,13 +114,3 @@ class UserData:
             return True
         else:
             raise ValueError("User ID does not exist.")
-
-    def plot_user_data(self, user_id):
-        if user_id not in self.data["users"]:
-            raise ValueError("User ID does not exist.")
-        user = self.data["users"][user_id]
-        labels = ['Balance', 'Total Money', 'Remaining Money']
-        values = [user['balance'], user['total_money'], user['remaining_money']]
-        plt.bar(labels, values)
-        plt.title(f"User Data for {user['name']}")
-        plt.show()
