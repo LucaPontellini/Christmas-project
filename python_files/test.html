@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino Earnings Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div style="width: 75%; margin: auto;">
+        <canvas id="earningsChart"></canvas>
+    </div>
+    
+    <script>
+        // Carica i dati dal file JSON
+        fetch('earnings.json')
+            .then(response => response.json())
+            .then(data => {
+                // Estrai i mesi e i guadagni dai dati JSON
+                const months = Object.keys(data);
+                const earnings = Object.values(data);
+
+                // Configurazione del grafico
+                const config = {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Casino Earnings ($)',
+                            data: earnings,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Months'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Earnings ($)'
+                                }
+                            }
+                        }
+                    }
+                };
+
+                // Crea il grafico
+                const earningsChart = new Chart(
+                    document.getElementById('earningsChart'),
+                    config
+                );
+            })
+            .catch(error => console.error('Error loading the JSON data:', error));
+    </script>
+</body>
+</html>
