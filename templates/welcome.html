@@ -11,15 +11,20 @@
   </style>
 </head>
 <body>
-    <h1>Ponte's Casinò</h1>
-    <a class="play-button" href="{{ url_for('casino_home') }}">Play</a>
+    <div class="center-content">
+        <div class="monopoly-man"></div>
+        <h1>Ponte's Casino</h1>
+        <a class="play-button" href="{{ url_for('casino_home') }}">Play</a>
+    </div>
     <audio id="background-music" src="{{ url_for('static', filename='music/Invisible Cities.mp3') }}" controls loop hidden></audio>
     <div class="info-creator">
         <h2>Information About the Creator</h2>
-        <p><a href="https://instagram.com/lucapontellini_?igshid=OGQ5ZDc2ODk2ZA%3D%3D&utm_source=qr">First Instagram account</a></p>
-        <p><a href="https://instagram.com/plastici.f3rroviari?igshid=NGVhN2U2NjQ0Yg%3D%3D&utm_source=qr">Second Instagram account</a></p>
-        <p><a href="https://youtube.com/@plastici.ferroviari?si=wkOH-Bw3nANmbl_D">YouTube Channel</a></p>
-        <p><a href="https://github.com/LucaPontellini">GitHub Profile</a></p>
+        <div class="links">
+            <a href="https://instagram.com/lucapontellini_?igshid=OGQ5ZDc2ODk2ZA%3D%3D&utm_source=qr">First Instagram account</a>
+            <a href="https://instagram.com/plastici.f3rroviari?igshid=NGVhN2U2NjQ0Yg%3D%3D&utm_source=qr">Second Instagram account</a>
+            <a href="https://youtube.com/@plastici.ferroviari?si=wkOH-Bw3nANmbl_D">YouTube Channel</a>
+            <a href="https://github.com/LucaPontellini">GitHub Profile</a>
+        </div>
     </div>
 
     <script>
@@ -34,10 +39,10 @@
         // Avvia la musica quando la pagina viene caricata
         window.addEventListener('load', playBackgroundMusic);
 
-        // Rileva quando l'utente torna indietro e reindirizza alla pagina return_to_cover_project.html
+        // Rileva quando l'utente torna indietro e reindirizza alla pagina return_to_welcome
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
-                window.location.href = 'return_to_welcome.html';
+                window.location.href = "{{ url_for('return_to_welcome') }}";
             }
         });
     </script>

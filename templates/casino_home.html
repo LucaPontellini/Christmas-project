@@ -7,48 +7,299 @@
 <body>
     <audio id="background-music" src="{{ url_for('static', filename='music/Jazzy Smile.mp3') }}" controls loop hidden></audio>
     <div class="games">
+        <!-- Giochi di Carte -->
         <div class="game">
             <img src="{{ url_for('static', filename='casino_games_photos/blackjack.jpg') }}" alt="Blackjack">
             <p>Blackjack</p>
-            <button onclick="alert('The selected game is not yet added. It is under development.')">Play</button>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
         </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+        
         <div class="game">
             <img src="{{ url_for('static', filename='casino_games_photos/caribbean_stud_poker.jpg') }}" alt="Caribbean Stud Poker">
             <p>Caribbean Stud Poker</p>
-            <button onclick="alert('The selected game is not yet added. It is under development.')">Play</button>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
         </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/poker_texas_holdem.jpg') }}" alt="Poker Texas Hold'em">
+            <p>Poker Texas Hold'em</p>
+            <button onclick="window.location.href='{{ url_for('poker_rules') }}';">Play</button>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/three_card_poker.jpeg') }}" alt="Three Card Poker">
+            <p>Three Card Poker</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/pai_gow_poker.jpeg') }}" alt="Pai Gow Poker">
+            <p>Pai Gow Poker</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/red_dog.jpeg') }}" alt="Red Dog">
+            <p>Red Dog</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/let_it_ride.jpeg') }}" alt="Let It Ride">
+            <p>Let It Ride</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/war.jpeg') }}" alt="War">
+            <p>War</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Giochi di Dadi -->
         <div class="game">
             <img src="{{ url_for('static', filename='casino_games_photos/crabs.jpg') }}" alt="Craps">
             <p>Craps</p>
-            <button onclick="alert('The selected game is not yet added. It is under development.')">Play</button>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
         </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
         <div class="game">
-            <img src="{{ url_for('static', filename='casino_games_photos/poker_texas_holdem.jpg') }}" alt="Poker Texas Holdem">
-            <p>Poker Texas Hold'em</p>
-            <button onclick="window.location.href='{{ url_for('poker_rules') }}'">Play</button>
+            <img src="{{ url_for('static', filename='casino_games_photos/sic_bo.png') }}" alt="Sic Bo">
+            <p>Sic Bo</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
         </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Giochi di Roulette -->
         <div class="game">
-            <img src="{{ url_for('static', filename='casino_games_photos/roulette.jpg') }}" alt="Roulette">
-            <p>Roulette</p>
-            <button onclick="alert('The selected game is not yet added. It is under development.')">Play</button>
+            <img src="{{ url_for('static', filename='casino_games_photos/american_roulette.jpg') }}" alt="Roulette Americana">
+            <p>American Roulette</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
         </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
         <div class="game">
-            <img src="{{ url_for('static', filename='casino_games_photos/slot_machine.jpg') }}" alt="Slot Machine">
-            <p>Slot Machine</p>
-            <button onclick="alert('The selected game is not yet added. It is under development.')">Play</button>
+            <img src="{{ url_for('static', filename='casino_games_photos/french_roulette.jpeg') }}" alt="Roulette Francese">
+            <p>French Roulette</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
         </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Slot Machine -->
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/video_slot.jpg') }}" alt="Video Slot">
+            <p>Video Slot</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/progressive_slot.jpeg') }}" alt="Progressive Slot">
+            <p>Progressive Slot</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Video Poker -->
         <div class="game">
             <img src="{{ url_for('static', filename='casino_games_photos/video_poker.jpg') }}" alt="Video Poker">
             <p>Video Poker</p>
-            <button onclick="alert('The selected game is not yet added. It is under development.')">Play</button>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
         </div>
-        <div class="game cashier">
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/jacks_or_better.jpeg') }}" alt="Jacks or Better">
+            <p>Jacks or Better</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/deuces_wild.jpg') }}" alt="Deuces Wild">
+            <p>Deuces Wild</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/joker_poker.jpg') }}" alt="Joker Poker">
+            <p>Joker Poker</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Giochi di Lotteria -->
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/keno.jpeg') }}" alt="Keno">
+            <p>Keno</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Giochi di Ruota -->
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/big_six_wheel.png') }}" alt="Big Six Wheel">
+            <p>Big Six Wheel</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/dream_catcher.jpg') }}" alt="Dream Catcher">
+            <p>Dream Catcher</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <!-- Giochi di Baccarat -->
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/baccarat.jpeg') }}" alt="Baccarat">
+            <p>Baccarat</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/punto_banco.jpeg') }}" alt="Punto Banco">
+            <p>Punto Banco</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/mini_baccarat.jpeg') }}" alt="Mini Baccarat">
+            <p>Mini Baccarat</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <!-- Giochi Sportivi -->
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/virtual_sports.jpg') }}" alt="Virtual Sports">
+            <p>Virtual Sports</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/fantasy_sports.jpg') }}" alt="Fantasy Sports">
+            <p>Fantasy Sports</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/e_sports.png') }}" alt="E-Sports">
+            <p>E-Sports</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/horse_racing.jpeg') }}" alt="Horse Racing">
+            <p>Horse Racing</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+
+        <div class="game">
+            <img src="{{ url_for('static', filename='casino_games_photos/greyhound_racing.jpg') }}" alt="Greyhound Racing">
+            <p>Greyhound Racing</p>
+            <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
+        </div>
+
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+        
+        <!-- Cassiere -->
+        <div class="game">
             <img src="{{ url_for('static', filename='cashier.webp') }}" alt="Cashier">
             <p>Cashier</p>
-            <button onclick="window.location.href='{{ url_for('cashier_dashboard') }}'">Go to the Cashier</button>
-        </div>        
+            <button onclick="window.location.href='{{ url_for('cashier_dashboard') }}';">Go to the Cashier</button>
+        </div>
     </div>
-
     <script>
         // Funzione per avviare la musica
         function playBackgroundMusic() {
@@ -67,6 +318,18 @@
                 window.location.href = 'return_to_casino_home.html';
             }
         });
+
+        // Mostra il messaggio di errore
+        function showErrorMessage(message) {
+            document.getElementById('error-text').innerHTML = message;
+            document.getElementById('error-message').style.display = 'block';
+            setTimeout(hideErrorMessage, 5000); // Nasconde il messaggio dopo 5 secondi
+        }
+
+        // Nasconde il messaggio di errore
+        function hideErrorMessage() {
+            document.getElementById('error-message').style.display = 'none';
+        }
     </script>
 </body>
 </html>

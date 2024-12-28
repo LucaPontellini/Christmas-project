@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Casino Cashier Operations</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/cashier_dashboard.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/cashier_operations.css') }}">
 </head>
 <body>
     <!-- Elemento audio per la musica -->
-    <audio id="background-music" src="{{ url_for('static', filename='Musica_per_il_Poker/Jazzy Smile.mp3') }}" controls loop hidden></audio>
+    <audio id="background-music" src="{{ url_for('static', filename='music/Jazzy Smile.mp3') }}" controls loop hidden></audio>
 
     <div class="overlay"></div>
     <div class="content-wrapper">
@@ -82,7 +82,19 @@
             <!-- Form per aggiornare il denaro totale -->
             <section>
                 <form action="/update_total_money" method="post">
-                    <input type="hidden" id="remaining-money" name="remaining_money" value="{{ remaining_money }}">
+                    <select id="payment_method" name="payment_method" class="chip-select">
+                        <option value="" disabled selected>Select your payment method:</option>
+                        <option value="visa">Visa</option>
+                        <option value="mastercard">MasterCard</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="skrill">Skrill</option>
+                        <option value="neteller">Neteller</option>
+                        <option value="bitcoin">Bitcoin (BTC)</option>
+                        <option value="paysafecard">Paysafecard</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="apple_pay">Apple Pay</option>
+                        <option value="google_pay">Google Pay</option>
+                    </select>
                     <label for="total-money">Update Total Money:</label><br>
                     <input type="number" id="total-money" name="total_money" min="0"><br>
                     <input type="submit" value="Update">
