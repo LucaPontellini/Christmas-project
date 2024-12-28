@@ -18,7 +18,7 @@ body {
 .monopoly-man {
     width: 250px; /* Ingrandisce ulteriormente l'immagine */
     height: 250px;
-    background-image: url('../monopoly_man.png');
+    background-image: url('../monopoly_man.png'); /* Assicurati che il percorso sia corretto */
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
@@ -102,6 +102,24 @@ h1 {
     background-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border: 2px solid #FFD700; /* Aggiunge un bordo dorato */
+    display: flex;
+    align-items: center;
+    background-size: 1.2em; /* Altezza uguale al testo del link */
+    background-repeat: no-repeat;
+    background-position: left center;
+    padding-left: 40px; /* Spazio per il logo */
+}
+
+.info-creator .links a.instagram {
+    background-image: url('../instagram.jpeg');
+}
+
+.info-creator .links a.youtube {
+    background-image: url('../youtube.jpeg');
+}
+
+.info-creator .links a.github {
+    background-image: url('../github.jpeg');
 }
 
 .info-creator .links a:hover {
