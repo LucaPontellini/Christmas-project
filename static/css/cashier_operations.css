@@ -1,5 +1,5 @@
 body {
-    background-image: url("{{ url_for('static', filename='cashier.jpg') }}");
+    background-image: url("/static/cashier.jpg");
     background-size: cover;
     margin: 0;
     padding: 0;
@@ -68,7 +68,7 @@ input[type="submit"]:hover {
     background-color: #45a049;
 }
 
-select#chip-color, select#chip-color-reconvert {
+select#chip-color, select#chip-color-reconvert, select#payment_method {
     width: 100%;
     height: 40px;
     background-color: transparent;
@@ -84,7 +84,7 @@ select#chip-color, select#chip-color-reconvert {
     cursor: pointer;
 }
 
-select#chip-color option, select#chip-color-reconvert option {
+select#chip-color option, select#chip-color-reconvert option, select#payment_method option {
     height: 30px;
 }
 
