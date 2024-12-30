@@ -207,18 +207,39 @@ def convert_to_chips():
         chip_color = request.form['chip-color']
         
         if not amount_str.strip():
-            raise ValueError("Please enter a valid amount.")
+            error_message = "Please enter a valid amount."
+            return render_template(
+                'cashier_operations.html',
+                error_message=error_message,
+                value_of_chips=chips_data()["value_of_chips"],
+                total_money=user['total_money'],
+                remaining_money=user['remaining_money']
+            )
         
         amount = int(amount_str)
         chip_value = chips_data()["value_of_chips"].get(chip_color)
         
         if not chip_value:
-            raise ValueError("Invalid chip color selected.")
+            error_message = "Invalid chip color selected."
+            return render_template(
+                'cashier_operations.html',
+                error_message=error_message,
+                value_of_chips=chips_data()["value_of_chips"],
+                total_money=user['total_money'],
+                remaining_money=user['remaining_money']
+            )
         
         total_cost = amount * chip_value
         
         if total_cost > user["remaining_money"]:
-            raise ValueError("Insufficient funds.")
+            error_message = "Insufficient funds."
+            return render_template(
+                'cashier_operations.html',
+                error_message=error_message,
+                value_of_chips=chips_data()["value_of_chips"],
+                total_money=user['total_money'],
+                remaining_money=user['remaining_money']
+            )
     
     except KeyError:
         error_message = "Please enter a valid amount and select a chip color."
