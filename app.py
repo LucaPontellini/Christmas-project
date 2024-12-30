@@ -213,12 +213,22 @@ def play():
     if user_id:
         user_data = load_user_data()
         user = user_data['users'].get(user_id)
-        if user and user['balance'] > 0:
-            return render_template('play.html')
+        if user:
+            has_chips = any(amount > 0 for amount in user['user_chips'].values())
+            if user['remaining_money'] > 0 or has_chips:
+                return render_template('play.html')
+            else:
+                error_message = "You need to have some chips or remaining money to play."
+                redirect_url = url_for('cashier_dashboard_page')
+                return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
         else:
-            return redirect(url_for('register'))
+            error_message = "User not found. Please register to play."
+            redirect_url = url_for('register')
+            return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
     else:
-        return redirect(url_for('register'))
+        error_message = "You need to be logged in to play."
+        redirect_url = url_for('register')
+        return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
 
 @app.route("/update_total_money", methods=["POST"])
 def update_total_money():
