@@ -68,7 +68,8 @@ h1 {
     z-index: 1000;
     font-family: Arial, sans-serif;
     font-size: 16px;
-    width: 400px; /* Aumenta la larghezza */
+    max-width: 350px; /* Cambia width a max-width */
     text-align: center;
-    white-space: nowrap;
+    white-space: normal; /* Cambia nowrap a normal */
+    word-wrap: break-word; /* Aggiungi questa proprietà */
 }
