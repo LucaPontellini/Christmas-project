@@ -45,6 +45,8 @@ th, td {
     width: 100px; /* Imposta una larghezza fissa per tutte le carte */
     height: auto; /* Mantieni le proporzioni */
     border: none; /* Rimuovi il contorno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Aggiungi un'ombra per dare profondità */
+    border-radius: 10px; /* Aggiungi angoli arrotondati */
 }
 
 strong {
