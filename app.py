@@ -180,9 +180,10 @@ def convert_to_chips():
     user_id = request.cookies.get('username')
     
     if not user_id:
+        error_message = "User not authenticated."
         return render_template(
             'cashier_operations.html',
-            error_message="User not authenticated.",
+            error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
             remaining_money=0
@@ -192,9 +193,10 @@ def convert_to_chips():
     user = user_data['users'].get(user_id)
     
     if not user:
+        error_message = "User not found."
         return render_template(
             'cashier_operations.html',
-            error_message="User not found.",
+            error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
             remaining_money=0
@@ -219,18 +221,20 @@ def convert_to_chips():
             raise ValueError("Insufficient funds.")
     
     except KeyError:
+        error_message = "Please enter a valid amount and select a chip color."
         return render_template(
             'cashier_operations.html',
-            error_message="Please enter a valid amount and select a chip color.",
+            error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=user['total_money'],
             remaining_money=user['remaining_money']
         )
     
     except ValueError as e:
+        error_message = str(e)
         return render_template(
             'cashier_operations.html',
-            error_message=str(e),
+            error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=user['total_money'],
             remaining_money=user['remaining_money']
@@ -240,9 +244,10 @@ def convert_to_chips():
     user["user_chips"][chip_color] += amount
     save_user_data(user_data)
     
+    success_message = "Conversion successful."
     return render_template(
         'cashier_operations.html',
-        success_message="Conversion successful.",
+        success_message=success_message,
         value_of_chips=chips_data()["value_of_chips"],
         total_money=user['total_money'],
         remaining_money=user['remaining_money']
