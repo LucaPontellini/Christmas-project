@@ -185,7 +185,8 @@ def convert_to_chips():
             error_message="User not authenticated.",
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
-            remaining_money=0)
+            remaining_money=0
+        )
     
     user_data = load_user_data()
     user = user_data['users'].get(user_id)
@@ -196,18 +197,21 @@ def convert_to_chips():
             error_message="User not found.",
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
-            remaining_money=0)
+            remaining_money=0
+        )
     
     try:
         amount_str = request.form['amount']
         chip_color = request.form['chip-color']
         
-        if not amount_str.strip(): raise ValueError("Please enter a valid amount.")
+        if not amount_str.strip():
+            raise ValueError("Please enter a valid amount.")
         
         amount = int(amount_str)
         chip_value = chips_data()["value_of_chips"].get(chip_color)
         
-        if not chip_value: raise ValueError("Invalid chip color selected.")
+        if not chip_value:
+            raise ValueError("Invalid chip color selected.")
         
         total_cost = amount * chip_value
         
@@ -220,7 +224,8 @@ def convert_to_chips():
             error_message="Please enter a valid amount and select a chip color.",
             value_of_chips=chips_data()["value_of_chips"],
             total_money=user['total_money'],
-            remaining_money=user['remaining_money'])
+            remaining_money=user['remaining_money']
+        )
     
     except ValueError as e:
         return render_template(
@@ -228,7 +233,8 @@ def convert_to_chips():
             error_message=str(e),
             value_of_chips=chips_data()["value_of_chips"],
             total_money=user['total_money'],
-            remaining_money=user['remaining_money'])
+            remaining_money=user['remaining_money']
+        )
     
     user["remaining_money"] -= total_cost
     user["user_chips"][chip_color] += amount
@@ -239,7 +245,8 @@ def convert_to_chips():
         success_message="Conversion successful.",
         value_of_chips=chips_data()["value_of_chips"],
         total_money=user['total_money'],
-        remaining_money=user['remaining_money'])
+        remaining_money=user['remaining_money']
+    )
 
 @app.route('/home_poker')
 def home_poker():
@@ -284,7 +291,8 @@ def update_total_money():
             error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
-            remaining_money=0)
+            remaining_money=0
+        )
     
     user_data = load_user_data()
     user = user_data['users'].get(user_id)
@@ -296,7 +304,8 @@ def update_total_money():
             error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
-            remaining_money=0)
+            remaining_money=0
+        )
     
     payment_method = request.form.get('payment_method')
     if not payment_method:
@@ -306,7 +315,8 @@ def update_total_money():
             error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=user["total_money"],
-            remaining_money=user["remaining_money"])
+            remaining_money=user["remaining_money"]
+        )
     
     new_total_money_str = request.form.get("total_money", "")
     if not new_total_money_str.strip():
@@ -317,7 +327,8 @@ def update_total_money():
             value_of_chips=chips_data()["value_of_chips"],
             total_money=user["total_money"],
             remaining_money=user["remaining_money"],
-            payment_method=payment_method)
+            payment_method=payment_method
+        )
     
     try:
         new_total_money = int(new_total_money_str)
@@ -329,7 +340,8 @@ def update_total_money():
             value_of_chips=chips_data()["value_of_chips"],
             total_money=user["total_money"],
             remaining_money=user["remaining_money"],
-            payment_method=payment_method)
+            payment_method=payment_method
+        )
     
     user["total_money"] = new_total_money
     user["remaining_money"] = new_total_money
@@ -343,7 +355,8 @@ def update_total_money():
         success_message=success_message,
         value_of_chips=chips_data()["value_of_chips"],
         total_money=user['total_money'],
-        remaining_money=user['remaining_money'])
+        remaining_money=user['remaining_money']
+    )
 
 @app.route("/clear_all_data", methods=["POST"])
 def clear_all_data():
@@ -356,7 +369,8 @@ def clear_all_data():
             error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
-            remaining_money=0)
+            remaining_money=0
+        )
     
     user_data = load_user_data()
     user = user_data['users'].get(user_id)
@@ -368,7 +382,8 @@ def clear_all_data():
             error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
-            remaining_money=0)
+            remaining_money=0
+        )
     
     user["user_chips"] = {
         "white": 0,
@@ -392,7 +407,8 @@ def clear_all_data():
         success_message=success_message,
         value_of_chips=chips_data()["value_of_chips"],
         total_money=0,
-        remaining_money=0)
+        remaining_money=0
+    )
 
 @app.route('/cashier_dashboard', methods=['GET', 'POST'])
 def cashier_dashboard_page():
@@ -440,7 +456,8 @@ def reconvert():
             error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
-            remaining_money=0)
+            remaining_money=0
+        )
     
     user_data = load_user_data()
     user = user_data['users'].get(user_id)
@@ -452,7 +469,8 @@ def reconvert():
             error_message=error_message,
             value_of_chips=chips_data()["value_of_chips"],
             total_money=0,
-            remaining_money=0)
+            remaining_money=0
+        )
     
     value_of_chips = chips_data().get("value_of_chips", {})
     user_chips = user["user_chips"]
@@ -474,7 +492,8 @@ def reconvert():
         success_message=success_message,
         value_of_chips=chips_data()["value_of_chips"],
         total_money=user['total_money'],
-        remaining_money=user['remaining_money'])
+        remaining_money=user['remaining_money']
+    )
 
 def convert_back(chips_dict, value_of_chips):
     """This function converts chips back to money"""
