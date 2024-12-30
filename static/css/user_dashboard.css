@@ -92,3 +92,7 @@ select#chip-color option, select#chip-color-reconvert option {
 audio#background-music {
     display: none;
 }
+
+form {
+    margin-top: 20px; /* Aggiungi spazio tra i form */
+}

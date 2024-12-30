@@ -297,6 +297,19 @@ def clear_all_data():
     
     if not user: return jsonify({"error_message": "User not found."})
     
+    # Verifica se il denaro totale è zero
+    total_money_is_zero = user["total_money"] == 0
+    
+    # Verifica se il denaro rimanente è zero
+    remaining_money_is_zero = user["remaining_money"] == 0
+    
+    # Verifica se tutte le quantità di fiches sono zero
+    all_chips_are_zero = all(quantity == 0 for quantity in user["user_chips"].values())
+    
+    # Se tutte le condizioni sono vere, non c'è nulla da eliminare
+    if total_money_is_zero and remaining_money_is_zero and all_chips_are_zero: return jsonify({"error_message": "There is no data to clear."})
+    
+    # Procedi con la cancellazione dei dati
     user["user_chips"] = {
         "white": 0,
         "red": 0,
@@ -317,8 +330,7 @@ def clear_all_data():
         "error_message": "",
         "value_of_chips": chips_data()["value_of_chips"],
         "total_money": user["total_money"],
-        "remaining_money": user["remaining_money"]
-    })
+        "remaining_money": user["remaining_money"]})
 
 @app.route('/cashier_dashboard', methods=['GET', 'POST'])
 def cashier_dashboard_page():
