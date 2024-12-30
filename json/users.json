@@ -16,7 +16,8 @@
                 "light blue": 0
             },
             "total_money": 0,
-            "remaining_money": 0
+            "remaining_money": 0,
+            "payment_method": "visa"
         }
     }
 }

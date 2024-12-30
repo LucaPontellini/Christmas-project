@@ -206,17 +206,20 @@ def convert_to_chips():
         if total_cost > user["remaining_money"]:
             return jsonify({"error_message": "Insufficient funds."})
     
-    except KeyError:
-        return jsonify({"error_message": "Please enter a valid amount and select a chip color."})
+    except KeyError: return jsonify({"error_message": "Please enter a valid amount and select a chip color."})
     
-    except ValueError as e:
-        return jsonify({"error_message": str(e)})
+    except ValueError as e: return jsonify({"error_message": str(e)})
     
     user["remaining_money"] -= total_cost
     user["user_chips"][chip_color] += amount
     save_user_data(user_data)
     
-    return jsonify({"error_message": ""})
+    return jsonify({
+        "error_message": "",
+        "value_of_chips": chips_data()["value_of_chips"],
+        "total_money": user["total_money"],
+        "remaining_money": user["remaining_money"]
+    })
 
 @app.route('/home_poker')
 def home_poker():
@@ -254,27 +257,21 @@ def play():
 def update_total_money():
     user_id = request.cookies.get('username')
     
-    if not user_id:
-        return jsonify({"error_message": "User not authenticated."})
+    if not user_id: return jsonify({"error_message": "User not authenticated."})
     
     user_data = load_user_data()
     user = user_data['users'].get(user_id)
     
-    if not user:
-        return jsonify({"error_message": "User not found."})
+    if not user: return jsonify({"error_message": "User not found."})
     
     payment_method = request.form.get('payment_method')
-    if not payment_method:
-        return jsonify({"error_message": "Please select a payment method."})
+    if not payment_method: return jsonify({"error_message": "Please select a payment method."})
     
     new_total_money_str = request.form.get("total_money", "")
-    if not new_total_money_str.strip():
-        return jsonify({"error_message": "Please enter a valid amount."})
+    if not new_total_money_str.strip(): return jsonify({"error_message": "Please enter a valid amount."})
     
-    try:
-        new_total_money = int(new_total_money_str)
-    except ValueError:
-        return jsonify({"error_message": "Error: The amount must be an integer."})
+    try: new_total_money = int(new_total_money_str)
+    except ValueError: return jsonify({"error_message": "Error: The amount must be an integer."})
     
     user["total_money"] = new_total_money
     user["remaining_money"] = new_total_money
@@ -282,20 +279,23 @@ def update_total_money():
 
     save_user_data(user_data)
     
-    return jsonify({"error_message": ""})
+    return jsonify({
+        "error_message": "",
+        "value_of_chips": chips_data()["value_of_chips"],
+        "total_money": user["total_money"],
+        "remaining_money": user["remaining_money"]
+    })
 
 @app.route("/clear_all_data", methods=["POST"])
 def clear_all_data():
     user_id = request.cookies.get('username')
     
-    if not user_id:
-        return jsonify({"error_message": "User not authenticated."})
+    if not user_id: return jsonify({"error_message": "User not authenticated."})
     
     user_data = load_user_data()
     user = user_data['users'].get(user_id)
     
-    if not user:
-        return jsonify({"error_message": "User not found."})
+    if not user: return jsonify({"error_message": "User not found."})
     
     user["user_chips"] = {
         "white": 0,
@@ -313,7 +313,12 @@ def clear_all_data():
     
     save_user_data(user_data)
     
-    return jsonify({"error_message": ""})
+    return jsonify({
+        "error_message": "",
+        "value_of_chips": chips_data()["value_of_chips"],
+        "total_money": user["total_money"],
+        "remaining_money": user["remaining_money"]
+    })
 
 @app.route('/cashier_dashboard', methods=['GET', 'POST'])
 def cashier_dashboard_page():
@@ -354,14 +359,12 @@ def cashier_dashboard_page():
 def reconvert():
     user_id = request.cookies.get('username')
     
-    if not user_id:
-        return jsonify({"error_message": "User not authenticated."})
+    if not user_id: return jsonify({"error_message": "User not authenticated."})
     
     user_data = load_user_data()
     user = user_data['users'].get(user_id)
     
-    if not user:
-        return jsonify({"error_message": "User not found."})
+    if not user: return jsonify({"error_message": "User not found."})
     
     value_of_chips = chips_data().get("value_of_chips", {})
     user_chips = user["user_chips"]
@@ -369,15 +372,19 @@ def reconvert():
     remaining_money = user["remaining_money"] + total_money  # Aggiorna remaining_money con il totale convertito
 
     # Resetta i chip dell'utente a zero dopo la riconversione
-    for color in user_chips:
-        user_chips[color] = 0
+    for color in user_chips: user_chips[color] = 0
 
     user["total_money"] = user["total_money"]  # Mantieni il totale invariato
     user["remaining_money"] = remaining_money  # Aggiorna remaining_money con il totale convertito
 
     save_user_data(user_data)
     
-    return jsonify({"error_message": ""})
+    return jsonify({
+        "error_message": "",
+        "value_of_chips": chips_data()["value_of_chips"],
+        "total_money": user["total_money"],
+        "remaining_money": user["remaining_money"]
+    })
 
 def convert_back(chips_dict, value_of_chips):
     """This function converts chips back to money"""

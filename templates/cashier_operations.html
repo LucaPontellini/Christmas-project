@@ -29,7 +29,7 @@
                         <th>Value</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="chip-table-body">
                     {% for chip_color, chip_value in value_of_chips.items() %}
                     <tr>
                         <td>{{ chip_color }}</td>
@@ -47,11 +47,11 @@
                 <tbody>
                     <tr>
                         <td>Total Money</td>
-                        <td>${{ total_money }}</td> <!-- Segnaposto per il totale denaro -->
+                        <td id="total-money">${{ total_money }}</td> <!-- Segnaposto per il totale denaro -->
                     </tr>
                     <tr>
                         <td>Remaining Money</td>
-                        <td>${{ remaining_money }}</td> <!-- Segnaposto per il denaro rimanente -->
+                        <td id="remaining-money">${{ remaining_money }}</td> <!-- Segnaposto per il denaro rimanente -->
                     </tr>
                 </tbody>
             </table>
@@ -96,7 +96,7 @@
                         <option value="google_pay">Google Pay</option>
                     </select>
                     <label for="total-money">Update Total Money:</label><br>
-                    <input type="number" id="total-money" name="total_money" min="0"><br>
+                    <input type="number" id="total-money-input" name="total_money" min="0"><br>
                     <input type="submit" value="Update">
                 </form>
             </section>
@@ -155,6 +155,9 @@
             .then(data => {
                 if (data.error_message) {
                     showErrorMessage(data.error_message);
+                } else {
+                    // Aggiorna le tabelle con i nuovi dati
+                    updateTables(data);
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -170,6 +173,29 @@
             setTimeout(function() {
                 errorMessage.style.display = 'none';
             }, 5000);
+        }
+
+        // Funzione per aggiornare le tabelle con i nuovi dati
+        function updateTables(data) {
+            // Aggiorna la tabella dei colori delle fiches
+            var chipTableBody = document.getElementById('chip-table-body');
+            chipTableBody.innerHTML = '';
+            for (var chipColor in data.value_of_chips) {
+                var row = document.createElement('tr');
+                var colorCell = document.createElement('td');
+                colorCell.textContent = chipColor;
+                var valueCell = document.createElement('td');
+                valueCell.textContent = '$' + data.value_of_chips[chipColor];
+                row.appendChild(colorCell);
+                row.appendChild(valueCell);
+                chipTableBody.appendChild(row);
+            }
+
+            // Aggiorna la tabella del denaro totale e rimanente
+            var totalMoneyCell = document.getElementById('total-money');
+            totalMoneyCell.textContent = '$' + data.total_money;
+            var remainingMoneyCell = document.getElementById('remaining-money');
+            remainingMoneyCell.textContent = '$' + data.remaining_money;
         }
     </script>
 </body>
