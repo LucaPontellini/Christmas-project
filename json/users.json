@@ -1,0 +1,22 @@
+{
+    "users": {
+        "lucaponte@gmail.com": {
+            "name": "Luca Pontellini",
+            "email": "lucaponte@gmail.com",
+            "password": "123",
+            "user_chips": {
+                "white": 0,
+                "red": 0,
+                "blue": 0,
+                "green": 0,
+                "black": 0,
+                "purple": 0,
+                "yellow": 0,
+                "pink": 0,
+                "light blue": 0
+            },
+            "total_money": 0,
+            "remaining_money": 0
+        }
+    }
+}

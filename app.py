@@ -211,7 +211,8 @@ def convert_to_chips():
         
         total_cost = amount * chip_value
         
-        if total_cost > user["remaining_money"]: raise ValueError("Insufficient funds.")
+        if total_cost > user["remaining_money"]:
+            raise ValueError("Insufficient funds.")
     
     except KeyError:
         return render_template(
