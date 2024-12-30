@@ -61,25 +61,21 @@ def return_to_casino_home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        user_id = request.form['email']  # Utilizziamo l'email come user_id
+        user_id = request.form['email']
         name = request.form['fname'] + ' ' + request.form['lname']
-        balance = 0  # Imposta il saldo iniziale a 0
         email = request.form['email']
         password = request.form['psw']
         
         user_data = load_user_data()
         
-        # Inizializza la struttura dei dati degli utenti se è vuota
         if 'users' not in user_data:
             user_data['users'] = {}
 
-        # Controlla se l'utente è già registrato
         if user_id in user_data['users']:
             return 'User already registered. Please use a different email or login.'
 
         user_data['users'][user_id] = {
             'name': name,
-            'balance': balance,
             'email': email,
             'password': password,
             'user_chips': {
@@ -163,16 +159,16 @@ def cashier_dashboard():
         user_data = load_user_data()
         user = user_data['users'].get(user_id)
         if user:
-            total_money = user['balance']
-            remaining_money = user['balance']
+            total_money = user['total_money']
+            remaining_money = user['remaining_money']
             if request.method == 'POST':
                 total_money = request.form.get('total_money', type=int, default=total_money)
                 remaining_money = request.form.get('remaining_money', type=int, default=remaining_money)
             return render_template('cashier_operations.html', value_of_chips=chips_data()["value_of_chips"], total_money=total_money, remaining_money=remaining_money)
         else:
-            return redirect(url_for('register'))  # Reindirizza alla pagina di registrazione se l'utente non è trovato
+            return redirect(url_for('register'))
     else:
-        return redirect(url_for('register'))  # Reindirizza alla pagina di registrazione se l'utente non è autenticato
+        return redirect(url_for('register'))
 
 @app.route('/convert_to_chips', methods=['POST'])
 def convert_to_chips():
@@ -198,15 +194,14 @@ def convert_to_chips():
             except ValueError as e:
                 return render_template('cashier_operations.html', error_message=str(e), value_of_chips=chips_data()["value_of_chips"], total_money=user['total_money'], remaining_money=user['remaining_money'])
 
-            # Aggiorna il saldo e le fiches dell'utente
             user["remaining_money"] -= total_cost
             user["user_chips"][chip_color] += amount
             save_user_data(user_data)
-            return redirect(url_for('cashier_dashboard_page'))  # Usa 'cashier_dashboard_page' invece di 'cashier_operations'
+            return redirect(url_for('cashier_dashboard_page'))
         else:
-            return redirect(url_for('register'))  # Reindirizza alla pagina di registrazione se l'utente non è trovato
+            return redirect(url_for('register'))
     else:
-        return redirect(url_for('register'))  # Reindirizza alla pagina di registrazione se l'utente non è autenticato
+        return redirect(url_for('register'))
 
 @app.route('/home_poker')
 def home_poker():
@@ -273,7 +268,7 @@ def update_total_money():
             user["payment_method"] = payment_method
 
             save_user_data(user_data)
-            return redirect(url_for("cashier_dashboard_page"))  # Reindirizza alla pagina del cassiere
+            return redirect(url_for("cashier_dashboard_page"))
         else:
             return 'User not found'
     else:
@@ -299,7 +294,6 @@ def clear_all_data():
             }
             user["total_money"] = 0
             user["remaining_money"] = 0
-            user["balance"] = 0  # Aggiungi questa riga per resettare il saldo
             save_user_data(user_data)
             return redirect(url_for("cashier_dashboard"))
         else:
