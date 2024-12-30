@@ -68,11 +68,9 @@ def register():
         
         user_data = load_user_data()
         
-        if 'users' not in user_data:
-            user_data['users'] = {}
+        if 'users' not in user_data: user_data['users'] = {}
 
-        if user_id in user_data['users']:
-            return 'User already registered. Please use a different email or login.'
+        if user_id in user_data['users']: return 'User already registered. Please use a different email or login.'
 
         user_data['users'][user_id] = {
             'name': name,
@@ -94,20 +92,23 @@ def register():
         }
         save_user_data(user_data)
         return redirect(url_for('login'))
+    
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_id = request.form['email']  # Utilizziamo l'email come user_id
+        user_id = request.form['email']  #L'email è l'user_id 
         password = request.form['psw']
+        
         user_data = load_user_data()
+        
         if user_id in user_data['users'] and user_data['users'][user_id]['password'] == password:
             response = redirect(url_for('casino_home'))
             response.set_cookie('username', user_id)
             return response
-        else:
-            return 'Invalid credentials'
+        else: return 'Invalid credentials'
+    
     return render_template('login.html')
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
@@ -116,11 +117,10 @@ def forgot_password():
         email = request.form['email']
         user_data = load_user_data()
         
-        # Verifica se l'utente esiste nel file JSON
-        if email not in user_data['users']:
-            return 'User not found. Please check your email or register for an account.'
+        #Controllo nel file JSON per verificare se l'utente esiste
+        if email not in user_data['users']: return 'User not found. Please check your email or register for an account.'
         
-        # Procedi con il recupero della password (ad esempio, invia un'email con un link per resettare la password)
+        #Procedi con il recupero della password (ad esempio, invia un'email con un link per resettare la password)
         reset_link = url_for('reset_password', _external=True)
         email_body = f"Click the following link to reset your password: {reset_link}"
         
@@ -144,8 +144,7 @@ def reset_password():
             user_data['users'][email]['password'] = new_password
             save_user_data(user_data)
             return redirect(url_for('login'))
-        else:
-            return 'User not found'
+        else: return 'User not found'
     return render_template('reset_password.html')
 
 @app.route('/poker_rules')
@@ -155,53 +154,91 @@ def poker_rules():
 @app.route('/cashier_operations', methods=['GET', 'POST'])
 def cashier_dashboard():
     user_id = request.cookies.get('username')
-    if user_id:
-        user_data = load_user_data()
-        user = user_data['users'].get(user_id)
-        if user:
-            total_money = user['total_money']
-            remaining_money = user['remaining_money']
-            if request.method == 'POST':
-                total_money = request.form.get('total_money', type=int, default=total_money)
-                remaining_money = request.form.get('remaining_money', type=int, default=remaining_money)
-            return render_template('cashier_operations.html', value_of_chips=chips_data()["value_of_chips"], total_money=total_money, remaining_money=remaining_money)
-        else:
-            return redirect(url_for('register'))
-    else:
-        return redirect(url_for('register'))
+    
+    if not user_id: return redirect(url_for('register'))
+    
+    user_data = load_user_data()
+    user = user_data['users'].get(user_id)
+    
+    if not user: return redirect(url_for('register'))
+    
+    total_money = user['total_money']
+    remaining_money = user['remaining_money']
+    
+    if request.method == 'POST':
+        total_money = request.form.get('total_money', type=int, default=total_money)
+        remaining_money = request.form.get('remaining_money', type=int, default=remaining_money)
+    
+    return render_template(
+        'cashier_operations.html',
+        value_of_chips=chips_data()["value_of_chips"],
+        total_money=total_money,
+        remaining_money=remaining_money)
 
 @app.route('/convert_to_chips', methods=['POST'])
 def convert_to_chips():
     user_id = request.cookies.get('username')
-    if user_id:
-        user_data = load_user_data()
-        user = user_data['users'].get(user_id)
-        if user:
-            try:
-                amount_str = request.form['amount']
-                chip_color = request.form['chip-color']
-                if not amount_str.strip():
-                    raise ValueError("Please enter a valid amount.")
-                amount = int(amount_str)
-                chip_value = chips_data()["value_of_chips"].get(chip_color)
-                if not chip_value:
-                    raise ValueError("Invalid chip color selected.")
-                total_cost = amount * chip_value
-                if total_cost > user["remaining_money"]:
-                    raise ValueError("Insufficient funds.")
-            except KeyError:
-                return render_template('cashier_operations.html', error_message="Please enter a valid amount and select a chip color.", value_of_chips=chips_data()["value_of_chips"], total_money=user['total_money'], remaining_money=user['remaining_money'])
-            except ValueError as e:
-                return render_template('cashier_operations.html', error_message=str(e), value_of_chips=chips_data()["value_of_chips"], total_money=user['total_money'], remaining_money=user['remaining_money'])
-
-            user["remaining_money"] -= total_cost
-            user["user_chips"][chip_color] += amount
-            save_user_data(user_data)
-            return redirect(url_for('cashier_dashboard_page'))
-        else:
-            return redirect(url_for('register'))
-    else:
-        return redirect(url_for('register'))
+    
+    if not user_id:
+        return render_template(
+            'cashier_operations.html',
+            error_message="User not authenticated.",
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=0,
+            remaining_money=0)
+    
+    user_data = load_user_data()
+    user = user_data['users'].get(user_id)
+    
+    if not user:
+        return render_template(
+            'cashier_operations.html',
+            error_message="User not found.",
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=0,
+            remaining_money=0)
+    
+    try:
+        amount_str = request.form['amount']
+        chip_color = request.form['chip-color']
+        
+        if not amount_str.strip(): raise ValueError("Please enter a valid amount.")
+        
+        amount = int(amount_str)
+        chip_value = chips_data()["value_of_chips"].get(chip_color)
+        
+        if not chip_value: raise ValueError("Invalid chip color selected.")
+        
+        total_cost = amount * chip_value
+        
+        if total_cost > user["remaining_money"]: raise ValueError("Insufficient funds.")
+    
+    except KeyError:
+        return render_template(
+            'cashier_operations.html',
+            error_message="Please enter a valid amount and select a chip color.",
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=user['total_money'],
+            remaining_money=user['remaining_money'])
+    
+    except ValueError as e:
+        return render_template(
+            'cashier_operations.html',
+            error_message=str(e),
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=user['total_money'],
+            remaining_money=user['remaining_money'])
+    
+    user["remaining_money"] -= total_cost
+    user["user_chips"][chip_color] += amount
+    save_user_data(user_data)
+    
+    return render_template(
+        'cashier_operations.html',
+        success_message="Conversion successful.",
+        value_of_chips=chips_data()["value_of_chips"],
+        total_money=user['total_money'],
+        remaining_money=user['remaining_money'])
 
 @app.route('/home_poker')
 def home_poker():
@@ -210,169 +247,233 @@ def home_poker():
 @app.route('/play')
 def play():
     user_id = request.cookies.get('username')
-    if user_id:
-        user_data = load_user_data()
-        user = user_data['users'].get(user_id)
-        if user:
-            has_chips = any(amount > 0 for amount in user['user_chips'].values())
-            if user['remaining_money'] > 0 or has_chips:
-                return render_template('play.html')
-            else:
-                error_message = "You need to have some chips or remaining money to play."
-                redirect_url = url_for('cashier_dashboard_page')
-                return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
-        else:
-            error_message = "User not found. Please register to play."
-            redirect_url = url_for('register')
-            return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
-    else:
+    
+    if not user_id:
         error_message = "You need to be logged in to play."
         redirect_url = url_for('register')
+        return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
+    
+    user_data = load_user_data()
+    user = user_data['users'].get(user_id)
+    
+    if not user:
+        error_message = "User not found. Please register to play."
+        redirect_url = url_for('register')
+        return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
+    
+    # Controlla se l'utente ha fiches
+    user_chips = user['user_chips'].values()
+    has_chips = any(amount > 0 for amount in user_chips)
+    
+    if user['remaining_money'] > 0 or has_chips:
+        return render_template('play.html')
+    else:
+        error_message = "You need to have some chips or remaining money to play."
+        redirect_url = url_for('cashier_dashboard_page')
         return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
 
 @app.route("/update_total_money", methods=["POST"])
 def update_total_money():
     user_id = request.cookies.get('username')
-    if user_id:
-        user_data = load_user_data()
-        user = user_data['users'].get(user_id)
-        if user:
-            payment_method = request.form.get('payment_method')
-            if not payment_method:
-                error_message = "Please select a payment method."
-                return render_template(
-                    "cashier_operations.html",
-                    error_message=error_message,
-                    value_of_chips=chips_data()["value_of_chips"],
-                    total_money=user["total_money"],
-                    remaining_money=user["remaining_money"]
-                )
+    
+    if not user_id:
+        error_message = "User not authenticated."
+        return render_template(
+            "cashier_operations.html",
+            error_message=error_message,
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=0,
+            remaining_money=0)
+    
+    user_data = load_user_data()
+    user = user_data['users'].get(user_id)
+    
+    if not user:
+        error_message = "User not found."
+        return render_template(
+            "cashier_operations.html",
+            error_message=error_message,
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=0,
+            remaining_money=0)
+    
+    payment_method = request.form.get('payment_method')
+    if not payment_method:
+        error_message = "Please select a payment method."
+        return render_template(
+            "cashier_operations.html",
+            error_message=error_message,
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=user["total_money"],
+            remaining_money=user["remaining_money"])
+    
+    new_total_money_str = request.form.get("total_money", "")
+    if not new_total_money_str.strip():
+        error_message = "Please enter a valid amount."
+        return render_template(
+            "cashier_operations.html",
+            error_message=error_message,
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=user["total_money"],
+            remaining_money=user["remaining_money"],
+            payment_method=payment_method)
+    
+    try:
+        new_total_money = int(new_total_money_str)
+    except ValueError:
+        error_message = "Error: The amount must be an integer."
+        return render_template(
+            "cashier_operations.html",
+            error_message=error_message,
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=user["total_money"],
+            remaining_money=user["remaining_money"],
+            payment_method=payment_method)
+    
+    user["total_money"] = new_total_money
+    user["remaining_money"] = new_total_money
+    user["payment_method"] = payment_method
 
-            new_total_money_str = request.form.get("total_money", "")
-            if not new_total_money_str.strip():
-                error_message = "Please enter a valid amount."
-                return render_template(
-                    "cashier_operations.html",
-                    error_message=error_message,
-                    value_of_chips=chips_data()["value_of_chips"],
-                    total_money=user["total_money"],
-                    remaining_money=user["remaining_money"],
-                    payment_method=payment_method
-                )
-
-            try:
-                new_total_money = int(new_total_money_str)
-            except ValueError:
-                error_message = "Error: The amount must be an integer."
-                return render_template(
-                    "cashier_operations.html",
-                    error_message=error_message,
-                    value_of_chips=chips_data()["value_of_chips"],
-                    total_money=user["total_money"],
-                    remaining_money=user["remaining_money"],
-                    payment_method=payment_method
-                )
-
-            user["total_money"] = new_total_money
-            user["remaining_money"] = new_total_money
-            user["payment_method"] = payment_method
-
-            save_user_data(user_data)
-            return redirect(url_for("cashier_dashboard_page"))
-        else:
-            return 'User not found'
-    else:
-        return redirect(url_for('register'))
+    save_user_data(user_data)
+    
+    success_message = "Total money updated successfully."
+    return render_template(
+        'cashier_operations.html',
+        success_message=success_message,
+        value_of_chips=chips_data()["value_of_chips"],
+        total_money=user['total_money'],
+        remaining_money=user['remaining_money'])
 
 @app.route("/clear_all_data", methods=["POST"])
 def clear_all_data():
     user_id = request.cookies.get('username')
-    if user_id:
-        user_data = load_user_data()
-        user = user_data['users'].get(user_id)
-        if user:
-            user["user_chips"] = {
-                "white": 0,
-                "red": 0,
-                "blue": 0,
-                "green": 0,
-                "black": 0,
-                "purple": 0,
-                "yellow": 0,
-                "pink": 0,
-                "light blue": 0,
-            }
-            user["total_money"] = 0
-            user["remaining_money"] = 0
-            save_user_data(user_data)
-            return redirect(url_for("cashier_dashboard"))
-        else:
-            return 'User not found'
-    else:
-        return redirect(url_for('register'))
+    
+    if not user_id:
+        error_message = "User not authenticated."
+        return render_template(
+            'cashier_operations.html',
+            error_message=error_message,
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=0,
+            remaining_money=0)
+    
+    user_data = load_user_data()
+    user = user_data['users'].get(user_id)
+    
+    if not user:
+        error_message = "User not found."
+        return render_template(
+            'cashier_operations.html',
+            error_message=error_message,
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=0,
+            remaining_money=0)
+    
+    user["user_chips"] = {
+        "white": 0,
+        "red": 0,
+        "blue": 0,
+        "green": 0,
+        "black": 0,
+        "purple": 0,
+        "yellow": 0,
+        "pink": 0,
+        "light blue": 0,
+    }
+    user["total_money"] = 0
+    user["remaining_money"] = 0
+    
+    save_user_data(user_data)
+    
+    success_message = "All data cleared successfully."
+    return render_template(
+        'cashier_operations.html',
+        success_message=success_message,
+        value_of_chips=chips_data()["value_of_chips"],
+        total_money=0,
+        remaining_money=0)
 
 @app.route('/cashier_dashboard', methods=['GET', 'POST'])
 def cashier_dashboard_page():
     user_id = request.cookies.get('username')
-    if user_id:
-        user_data = load_user_data()
-        user = user_data['users'].get(user_id)
-        if user:
-            if request.method == "POST":
-                new_total_money_str = request.form.get("total_money", "")
-                if new_total_money_str.strip():
-                    new_total_money = int(new_total_money_str)
-                else:
-                    new_total_money = 0
+    
+    if not user_id: return redirect(url_for('register'))
+    
+    user_data = load_user_data()
+    user = user_data['users'].get(user_id)
+    
+    if not user: return 'User not found'
+    
+    if request.method == "POST":
+        new_total_money_str = request.form.get("total_money", "")
+        if new_total_money_str.strip():
+            new_total_money = int(new_total_money_str)
+        else: new_total_money = 0
 
-                difference = new_total_money - user["total_money"]
+        difference = new_total_money - user["total_money"]
 
-                user["remaining_money"] += difference
-                user["total_money"] = new_total_money
+        user["remaining_money"] += difference
+        user["total_money"] = new_total_money
 
-                save_user_data(user_data)
-                return redirect(url_for("cashier_dashboard_page"))
-            else:
-                value_of_chips = chips_data().get("value_of_chips", {})
-                total_money = user.get("total_money", 0)
-                remaining_money = user.get("remaining_money", 0)
-                return render_template(
-                    "cashier_operations.html",
-                    value_of_chips=value_of_chips,
-                    total_money=total_money,
-                    remaining_money=remaining_money,
-                )
-        else:
-            return 'User not found'
+        save_user_data(user_data)
+        return redirect(url_for("cashier_dashboard_page"))
     else:
-        return redirect(url_for('register'))
+        value_of_chips = chips_data().get("value_of_chips", {})
+        total_money = user.get("total_money", 0)
+        remaining_money = user.get("remaining_money", 0)
+        return render_template(
+            "cashier_operations.html",
+            value_of_chips=value_of_chips,
+            total_money=total_money,
+            remaining_money=remaining_money)
 
 # Funzione per la rotta '/reconvert'
 @app.route("/reconvert", methods=["POST"])
 def reconvert():
     user_id = request.cookies.get('username')
-    if user_id:
-        user_data = load_user_data()
-        user = user_data['users'].get(user_id)
-        if user:
-            value_of_chips = chips_data().get("value_of_chips", {})
-            user_chips = user["user_chips"]
-            total_money = convert_back(user_chips, value_of_chips)
-            remaining_money = user["remaining_money"] + total_money  # Aggiorna remaining_money con il totale convertito
+    
+    if not user_id:
+        error_message = "User not authenticated."
+        return render_template(
+            'cashier_operations.html',
+            error_message=error_message,
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=0,
+            remaining_money=0)
+    
+    user_data = load_user_data()
+    user = user_data['users'].get(user_id)
+    
+    if not user:
+        error_message = "User not found."
+        return render_template(
+            'cashier_operations.html',
+            error_message=error_message,
+            value_of_chips=chips_data()["value_of_chips"],
+            total_money=0,
+            remaining_money=0)
+    
+    value_of_chips = chips_data().get("value_of_chips", {})
+    user_chips = user["user_chips"]
+    total_money = convert_back(user_chips, value_of_chips)
+    remaining_money = user["remaining_money"] + total_money  # Aggiorna remaining_money con il totale convertito
 
-            # Resetta i chip dell'utente a zero dopo la riconversione
-            for color in user_chips:
-                user_chips[color] = 0
+    # Resetta i chip dell'utente a zero dopo la riconversione
+    for color in user_chips:
+        user_chips[color] = 0
 
-            user["total_money"] = user["total_money"]  # Mantieni il totale invariato
-            user["remaining_money"] = remaining_money  # Aggiorna remaining_money con il totale convertito
+    user["total_money"] = user["total_money"]  # Mantieni il totale invariato
+    user["remaining_money"] = remaining_money  # Aggiorna remaining_money con il totale convertito
 
-            save_user_data(user_data)
-            return redirect(url_for("user_dashboard"))
-        else:
-            return 'User not found'
-    else:
-        return redirect(url_for('register'))
+    save_user_data(user_data)
+    
+    success_message = "Chips reconverted successfully."
+    return render_template(
+        'cashier_operations.html',
+        success_message=success_message,
+        value_of_chips=chips_data()["value_of_chips"],
+        total_money=user['total_money'],
+        remaining_money=user['remaining_money'])
 
 def convert_back(chips_dict, value_of_chips):
     """This function converts chips back to money"""
@@ -386,26 +487,25 @@ def convert_back(chips_dict, value_of_chips):
 @app.route("/user_dashboard")
 def user_dashboard():
     user_id = request.cookies.get('username')
-    if user_id:
-        user_data = load_user_data()
-        user = user_data['users'].get(user_id)
-        if user:
-            user_chips = user["user_chips"]
-            total_money = user["total_money"]
-            remaining_money = user["remaining_money"]
-            value_of_chips = chips_data()["value_of_chips"]
+    
+    if not user_id: return redirect(url_for('register'))
+    
+    user_data = load_user_data()
+    user = user_data['users'].get(user_id)
+    
+    if not user: return 'User not found'
+    
+    user_chips = user["user_chips"]
+    total_money = user["total_money"]
+    remaining_money = user["remaining_money"]
+    value_of_chips = chips_data()["value_of_chips"]
 
-            return render_template(
-                "user_dashboard.html",
-                user_chips=user_chips,
-                total_money=total_money,
-                remaining_money=remaining_money,
-                value_of_chips=value_of_chips,
-            )
-        else:
-            return 'User not found'
-    else:
-        return redirect(url_for('register'))
+    return render_template(
+        "user_dashboard.html",
+        user_chips=user_chips,
+        total_money=total_money,
+        remaining_money=remaining_money,
+        value_of_chips=value_of_chips)
 
 if __name__ == '__main__':
     app.run(debug=True)

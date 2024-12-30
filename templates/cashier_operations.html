@@ -19,9 +19,9 @@
             </form>
         </header>
         <main>
-            {% if error_message %}
-            <div class="error-message">{{ error_message }}</div>
-            {% endif %}
+            <div id="error-message" class="error-message" style="display: none;">
+                <p id="error-text"></p>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -58,7 +58,7 @@
             
             <section>
                 <!-- Form per la conversione da denaro a fiches -->
-                <form action="/convert_to_chips" method="post">
+                <form action="/convert_to_chips" method="post" onsubmit="return handleFormSubmit(event, this)">
                     <label for="amount">Enter the amount to convert to chips:</label>
                     <input type="number" id="amount" name="amount" min="0"><br>
                     <select id="chip-color" name="chip-color" class="chip-select">
@@ -73,7 +73,7 @@
             
             <!-- Form per la riconversione di tutte le fiches in denaro -->
             <section>
-                <form action="/reconvert" method="post">
+                <form action="/reconvert" method="post" onsubmit="return handleFormSubmit(event, this)">
                     <p>Click the button below to convert all chips back to money.</p>
                     <input type="submit" value="Reconvert All Chips">
                 </form>
@@ -81,7 +81,7 @@
             
             <!-- Form per aggiornare il denaro totale -->
             <section>
-                <form action="/update_total_money" method="post">
+                <form action="/update_total_money" method="post" onsubmit="return handleFormSubmit(event, this)">
                     <select id="payment_method" name="payment_method" class="chip-select">
                         <option value="" disabled selected>Select your payment method:</option>
                         <option value="visa">Visa</option>
@@ -103,7 +103,7 @@
             
             <!-- Form per cancellare tutti i dati -->
             <section>
-                <form action="/clear_all_data" method="post">
+                <form action="/clear_all_data" method="post" onsubmit="return handleFormSubmit(event, this)">
                     <p>Click the button below to clear all data.</p>
                     <input type="submit" value="Clear All Data">
                 </form>
@@ -116,7 +116,7 @@
         </footer>
     </div>
 
-    <!-- Script JavaScript per il controllo della musica -->
+    <!-- Script JavaScript per il controllo della musica e dei messaggi di errore -->
     <script>
         setTimeout(function() {
             var errorMessage = document.querySelector('.error-message');
@@ -142,6 +142,35 @@
                 playBackgroundMusic();
             }
         });
+
+        // Funzione per gestire la sottomissione del form senza ricaricare la pagina
+        function handleFormSubmit(event, form) {
+            event.preventDefault();
+            var formData = new FormData(form);
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error_message) {
+                    showErrorMessage(data.error_message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+            return false;
+        }
+
+        // Funzione per mostrare il messaggio di errore
+        function showErrorMessage(message) {
+            var errorMessage = document.getElementById('error-message');
+            var errorText = document.getElementById('error-text');
+            errorText.innerHTML = message;
+            errorMessage.style.display = 'block';
+            setTimeout(function() {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
     </script>
 </body>
 </html>
