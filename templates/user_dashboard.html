@@ -54,7 +54,7 @@
             </form>
 
             <!-- Pulsante per riconvertire le fiches in denaro -->
-            <form action="/reconvert" method="post" style="margin-top: 20px;">
+            <form action="/reconvert" method="post" onsubmit="return handleReconvert(event, this)">
                 <input type="submit" value="Reconvert Chips to Money">
             </form>
         </main>
@@ -79,6 +79,27 @@
                 playBackgroundMusic();
             }
         });
+
+        // Funzione per gestire la riconversione delle fiches in denaro
+        function handleReconvert(event, form) {
+            event.preventDefault();
+            var formData = new FormData(form);
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error_message) {
+                    alert(data.error_message);
+                } else {
+                    // Aggiorna la pagina con i nuovi dati
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+            return false;
+        }
     </script>
 </body>
 </html>

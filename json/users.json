@@ -15,9 +15,9 @@
                 "pink": 0,
                 "light blue": 0
             },
-            "total_money": 0,
-            "remaining_money": 0,
-            "payment_method": "visa"
+            "total_money": 100,
+            "remaining_money": 100,
+            "payment_method": "skrill"
         }
     }
 }

@@ -359,20 +359,28 @@ def cashier_dashboard_page():
 def reconvert():
     user_id = request.cookies.get('username')
     
-    if not user_id: return jsonify({"error_message": "User not authenticated."})
+    if not user_id:
+        return jsonify({"error_message": "User not authenticated."})
     
     user_data = load_user_data()
     user = user_data['users'].get(user_id)
     
-    if not user: return jsonify({"error_message": "User not found."})
+    if not user:
+        return jsonify({"error_message": "User not found."})
     
     value_of_chips = chips_data().get("value_of_chips", {})
     user_chips = user["user_chips"]
+    
+    # Verifica che l'utente abbia delle fiches
+    if all(quantity == 0 for quantity in user_chips.values()):
+        return jsonify({"error_message": "You need to have some chips to reconvert to money."})
+    
     total_money = convert_back(user_chips, value_of_chips)
     remaining_money = user["remaining_money"] + total_money  # Aggiorna remaining_money con il totale convertito
 
     # Resetta i chip dell'utente a zero dopo la riconversione
-    for color in user_chips: user_chips[color] = 0
+    for color in user_chips:
+        user_chips[color] = 0
 
     user["total_money"] = user["total_money"]  # Mantieni il totale invariato
     user["remaining_money"] = remaining_money  # Aggiorna remaining_money con il totale convertito

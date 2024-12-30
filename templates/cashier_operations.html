@@ -30,12 +30,42 @@
                     </tr>
                 </thead>
                 <tbody id="chip-table-body">
-                    {% for chip_color, chip_value in value_of_chips.items() %}
                     <tr>
-                        <td>{{ chip_color }}</td>
-                        <td>${{ chip_value }}</td>
+                        <td>white</td>
+                        <td>$1</td>
                     </tr>
-                    {% endfor %}
+                    <tr>
+                        <td>red</td>
+                        <td>$5</td>
+                    </tr>
+                    <tr>
+                        <td>blue</td>
+                        <td>$10</td>
+                    </tr>
+                    <tr>
+                        <td>green</td>
+                        <td>$25</td>
+                    </tr>
+                    <tr>
+                        <td>black</td>
+                        <td>$100</td>
+                    </tr>
+                    <tr>
+                        <td>purple</td>
+                        <td>$500</td>
+                    </tr>
+                    <tr>
+                        <td>yellow</td>
+                        <td>$1000</td>
+                    </tr>
+                    <tr>
+                        <td>pink</td>
+                        <td>$5000</td>
+                    </tr>
+                    <tr>
+                        <td>light blue</td>
+                        <td>$10000</td>
+                    </tr>
                 </tbody>
             </table>
             
@@ -63,9 +93,15 @@
                     <input type="number" id="amount" name="amount" min="0"><br>
                     <select id="chip-color" name="chip-color" class="chip-select">
                         <option value="" disabled selected>Select the color of chips you want:</option>
-                        {% for chip_color, chip_value in value_of_chips.items() %}
-                        <option value="{{ chip_color }}">{{ chip_color }}</option>
-                        {% endfor %}
+                        <option value="white">white</option>
+                        <option value="red">red</option>
+                        <option value="blue">blue</option>
+                        <option value="green">green</option>
+                        <option value="black">black</option>
+                        <option value="purple">purple</option>
+                        <option value="yellow">yellow</option>
+                        <option value="pink">pink</option>
+                        <option value="light blue">light blue</option>
                     </select><br>
                     <input type="submit" value="Convert">
                 </form>
@@ -179,16 +215,11 @@
         function updateTables(data) {
             // Aggiorna la tabella dei colori delle fiches
             var chipTableBody = document.getElementById('chip-table-body');
-            chipTableBody.innerHTML = '';
-            for (var chipColor in data.value_of_chips) {
-                var row = document.createElement('tr');
-                var colorCell = document.createElement('td');
-                colorCell.textContent = chipColor;
-                var valueCell = document.createElement('td');
+            var chipColors = ["white", "red", "blue", "green", "black", "purple", "yellow", "pink", "light blue"];
+            for (var i = 0; i < chipColors.length; i++) {
+                var chipColor = chipColors[i];
+                var valueCell = chipTableBody.querySelector('tr:nth-child(' + (i + 1) + ') td:nth-child(2)');
                 valueCell.textContent = '$' + data.value_of_chips[chipColor];
-                row.appendChild(colorCell);
-                row.appendChild(valueCell);
-                chipTableBody.appendChild(row);
             }
 
             // Aggiorna la tabella del denaro totale e rimanente
