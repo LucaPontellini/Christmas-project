@@ -70,4 +70,5 @@ h1 {
     font-size: 16px;
     width: 350px;
     text-align: center;
+    white-space: nowrap; /* Aggiungi questa proprietà */
 }
