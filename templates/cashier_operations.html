@@ -22,9 +22,6 @@
             <div id="error-message" class="error-message" style="display: none;">
                 <p id="error-text"></p>
             </div>
-            <div id="success-message" class="success-message" style="display: none;">
-                <p id="success-text"></p>
-            </div>
             <table>
                 <thead>
                     <tr>
@@ -154,17 +151,10 @@
                 method: form.method,
                 body: formData
             })
-            .then(response => response.text())
-            .then(html => {
-                var parser = new DOMParser();
-                var doc = parser.parseFromString(html, 'text/html');
-                var errorMessage = doc.querySelector('.error-message');
-                var successMessage = doc.querySelector('.success-message');
-                
-                if (errorMessage) {
-                    showErrorMessage(errorMessage.textContent);
-                } else if (successMessage) {
-                    showSuccessMessage(successMessage.textContent);
+            .then(response => response.json())
+            .then(data => {
+                if (data.error_message) {
+                    showErrorMessage(data.error_message);
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -179,17 +169,6 @@
             errorMessage.style.display = 'block';
             setTimeout(function() {
                 errorMessage.style.display = 'none';
-            }, 5000);
-        }
-
-        // Funzione per mostrare il messaggio di successo
-        function showSuccessMessage(message) {
-            var successMessage = document.getElementById('success-message');
-            var successText = document.getElementById('success-text');
-            successText.innerHTML = message;
-            successMessage.style.display = 'block';
-            setTimeout(function() {
-                successMessage.style.display = 'none';
             }, 5000);
         }
     </script>
