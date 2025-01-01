@@ -1,6 +1,5 @@
 import json
 import os
-from random import choice, randint
 from matplotlib import pyplot as plt
 
 class CasinoUserData:
@@ -54,23 +53,6 @@ if not os.path.exists(user_file):
 
 user_data = CasinoUserData(user_file)
 
-def simulate_casino(user_data, games, num_users, num_rounds):
-    add_users(user_data, num_users)
-    play_games(user_data, games, num_rounds)
-
-def add_users(user_data, num_users):
-    for i in range(1, num_users + 1):
-        user_id = f"user{i}"
-        user_data.add_user(user_id, f"User {i}", randint(100, 1000), f"user{i}@example.com", "password")
-
-def play_games(user_data, games, num_rounds):
-    for _ in range(num_rounds):
-        for user_id in user_data.data["users"]:
-            game = choice(games)
-            result = randint(-100, 100)
-            user_data.add_win_loss(user_id, game, result)
-            user_data.update_balance(user_id, result)
-
 def get_user_ids(user_data):
     return list(user_data.data["users"].keys())
 
@@ -84,7 +66,6 @@ def get_user_revenues(user_data, user_ids):
         revenues.append(balance)
     return revenues
 
-#Funzione per creare un grafico a barre per il guadagno del casinò
 def plot_casino_revenue(user_data):
     user_ids = get_user_ids(user_data)
     revenues = get_user_revenues(user_data, user_ids)
@@ -99,9 +80,5 @@ def create_bar_chart(user_ids, revenues):
     plt.savefig('casino_revenue.png')
     plt.show()
 
-#Creazione di un set di dati di esempio e simulazione dell'andamento del casinò
-games = ["Blackjack", "Caribbean Stud Poker", "Craps", "Poker Texas Hold'em", "Roulette", "Slot Machine", "Video Poker"]
-simulate_casino(user_data, games, num_users=10, num_rounds=100)
-
-#Esempio di utilizzo della funzione del grafico
-plot_casino_revenue(user_data)
+if __name__ == "__main__":
+    plot_casino_revenue(user_data)
