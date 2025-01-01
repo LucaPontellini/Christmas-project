@@ -32,7 +32,7 @@ class UserRegistrationData:
         with open(self.file_path, 'w') as f:
             json.dump(self.data, f, indent=4)
 
-user_file = '../json/users_data.json'
+user_file = '../json/users.json'
 user_data = UserRegistrationData(user_file)
 
 def get_registration_dates(user_data):

@@ -42,7 +42,7 @@ class CasinoData:
         with open(self.file_path, 'w') as f:
             json.dump(self.data, f, indent=4)
 
-user_file = '../json/users_data.json'
+user_file = '../json/users.json'
 user_data = CasinoData(user_file)
 
 def get_user_ids(user_data):

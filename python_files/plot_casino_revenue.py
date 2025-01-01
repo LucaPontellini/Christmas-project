@@ -45,7 +45,7 @@ class CasinoUserData:
         with open(self.file_path, 'w') as f:
             json.dump(self.data, f, indent=4)
 
-user_file = '../json/users_data.json'
+user_file = '../json/users.json'
 
 if not os.path.exists(user_file):
     with open(user_file, 'w') as f:

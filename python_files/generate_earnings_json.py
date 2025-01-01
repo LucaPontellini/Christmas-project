@@ -2,7 +2,7 @@ import json
 import os
 
 def generate_earnings_json(file_path):
-    user_file = '../json/users_data.json'
+    user_file = '../json/users.json'
     
     if not os.path.exists(user_file):
         with open(user_file, 'w') as f:
