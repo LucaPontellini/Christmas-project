@@ -76,6 +76,7 @@ def register():
             'name': name,
             'email': email,
             'password': password,
+            'is_admin': False,
             'user_chips': {
                 "white": 0,
                 "red": 0,
@@ -98,14 +99,19 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_id = request.form['email']  #L'email è l'user_id 
+        user_id = request.form['email']  # L'email è l'user_id 
         password = request.form['psw']
         
         user_data = load_user_data()
         
         if user_id in user_data['users'] and user_data['users'][user_id]['password'] == password:
-            response = redirect(url_for('casino_home'))
-            response.set_cookie('username', user_id)
+            if user_data['users'][user_id].get('is_admin', False):
+                response = redirect(url_for('admin_dashboard'))
+                response.set_cookie('username', user_id)
+                response.set_cookie('admin', 'true')
+            else:
+                response = redirect(url_for('casino_home'))
+                response.set_cookie('username', user_id)
             return response
         else: return 'Invalid credentials'
     
@@ -117,10 +123,10 @@ def forgot_password():
         email = request.form['email']
         user_data = load_user_data()
         
-        #Controllo nel file JSON per verificare se l'utente esiste
+        # Controllo nel file JSON per verificare se l'utente esiste
         if email not in user_data['users']: return 'User not found. Please check your email or register for an account.'
         
-        #Procedi con il recupero della password (ad esempio, invia un'email con un link per resettare la password)
+        # Procedi con il recupero della password (ad esempio, invia un'email con un link per resettare la password)
         reset_link = url_for('reset_password', _external=True)
         email_body = f"Click the following link to reset your password: {reset_link}"
         
@@ -437,6 +443,47 @@ def user_dashboard():
         total_money=total_money,
         remaining_money=remaining_money,
         value_of_chips=value_of_chips)
+
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        access_code = request.form['access_code']
+        if access_code == 'your_admin_access_code':  # Sostituisci con il vero codice di accesso
+            response = redirect(url_for('admin_dashboard'))
+            response.set_cookie('admin', 'true')
+            return response
+        else:
+            return 'Invalid access code'
+    return render_template('admin_login.html')
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    if request.cookies.get('admin') != 'true':
+        return redirect(url_for('login'))
+    
+    user_data = load_user_data()
+    users = user_data['users']
+    
+    return render_template('admin_dashboard.html', users=users)
+
+@app.route('/earnings_json')
+def earnings_json():
+    with open('json/earnings.json', 'r') as f:
+        earnings_data = json.load(f)
+    return jsonify(earnings_data)
+
+@app.route('/registrations_json')
+def registrations_json():
+    user_data = load_user_data()
+    registrations = {}
+    for user_id, user_info in user_data['users'].items():
+        registration_date = user_info.get('registration_date')
+        if registration_date:
+            month = registration_date.split('-')[1]
+            if month not in registrations:
+                registrations[month] = 0
+            registrations[month] += 1
+    return jsonify(registrations)
 
 if __name__ == '__main__':
     app.run(debug=True)

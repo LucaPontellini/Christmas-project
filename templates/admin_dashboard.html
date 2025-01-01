@@ -5,36 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Admin Dashboard</h1>
-    <table>
-        <tr>
-            <th>User ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Balance</th>
-        </tr>
-        {% for user_id, user_info in users.items() %}
-        <tr>
-            <td>{{ user_id }}</td>
-            <td>{{ user_info['name'] }}</td>
-            <td>{{ user_info['email'] }}</td>
-            <td>{{ user_info['balance'] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="content-wrapper">
+        <h1>Admin Dashboard</h1>
+        <table>
+            <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Balance</th>
+            </tr>
+            {% for user_id, user_info in users.items() %}
+            <tr>
+                <td>{{ user_id }}</td>
+                <td>{{ user_info['name'] }}</td>
+                <td>{{ user_info['email'] }}</td>
+                <td>{{ user_info['balance'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
 
-    <div class="chart-container">
-        <canvas id="earningsChart"></canvas>
+        <div class="chart-container">
+            <canvas id="earningsChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="registrationsChart"></canvas>
+        </div>
     </div>
     
-    <div class="chart-container">
-        <canvas id="registrationsChart"></canvas>
-    </div>
+    <audio id="background-music" src="{{ url_for('static', filename='music/Jazzy Smile.mp3') }}" controls loop hidden></audio>
     
     <script>
+        // Funzione per avviare la musica
+        function playBackgroundMusic() {
+            var backgroundMusic = document.getElementById('background-music');
+            if (backgroundMusic.paused) {
+                backgroundMusic.play();
+            }
+        }
+
+        // Avvia la musica quando la pagina viene caricata
+        window.addEventListener('load', playBackgroundMusic);
+
+        // Rileva quando l'utente torna indietro e riprende la riproduzione della musica
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                playBackgroundMusic();
+            }
+        });
+
+        document.getElementById('background-music').play();
+
         fetch('{{ url_for('earnings_json') }}')
             .then(response => response.json())
             .then(data => {
