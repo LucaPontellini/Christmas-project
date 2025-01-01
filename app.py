@@ -124,7 +124,8 @@ def forgot_password():
         user_data = load_user_data()
         
         # Controllo nel file JSON per verificare se l'utente esiste
-        if email not in user_data['users']: return 'User not found. Please check your email or register for an account.'
+        if email not in user_data['users']:
+            return jsonify({"error_message": "User not found. Please check your email or register for an account."})
         
         # Procedi con il recupero della password (ad esempio, invia un'email con un link per resettare la password)
         reset_link = url_for('reset_password', _external=True)
@@ -134,9 +135,9 @@ def forgot_password():
         msg.body = email_body
         try:
             mail.send(msg)
-            return 'Password reset instructions have been sent to your email.'
+            return jsonify({"success_message": "Password reset instructions have been sent to your email."})
         except Exception as e:
-            return f'Failed to send email: {e}'
+            return jsonify({"error_message": f"Failed to send email: {e}"})
     return render_template('forgot_password.html')
 
 @app.route('/reset_password', methods=['GET', 'POST'])
