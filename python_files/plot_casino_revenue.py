@@ -67,6 +67,10 @@ def get_user_revenues(user_data, user_ids):
     return revenues
 
 def plot_casino_revenue(user_data):
+    if not user_data.data["users"]:
+        print("No users found. Cannot create the graph.")
+        return
+
     user_ids = get_user_ids(user_data)
     revenues = get_user_revenues(user_data, user_ids)
     create_bar_chart(user_ids, revenues)
