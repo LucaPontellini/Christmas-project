@@ -128,7 +128,7 @@ def forgot_password():
             return jsonify({"error_message": "User not found. Please check your email or register for an account."})
         
         # Procedi con il recupero della password (ad esempio, invia un'email con un link per resettare la password)
-        reset_link = url_for('reset_password', _external=True)
+        reset_link = url_for('reset_password', email=email, _external=True)
         email_body = f"Click the following link to reset your password: {reset_link}"
         
         msg = Message('Password Reset Request', sender='your_email@example.com', recipients=[email])
@@ -142,8 +142,8 @@ def forgot_password():
 
 @app.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():
+    email = request.args.get('email')
     if request.method == 'POST':
-        email = request.form['email']
         new_password = request.form['new_password']
         user_data = load_user_data()
         
@@ -151,8 +151,9 @@ def reset_password():
             user_data['users'][email]['password'] = new_password
             save_user_data(user_data)
             return redirect(url_for('login'))
-        else: return 'User not found'
-    return render_template('reset_password.html')
+        else:
+            return 'User not found'
+    return render_template('reset_password.html', email=email)
 
 @app.route('/poker_rules')
 def poker_rules():
