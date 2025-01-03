@@ -3,12 +3,43 @@ body {
     background-size: cover;
     background-color: rgba(36, 36, 36, 0.4);
     backdrop-filter: blur(7px);
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.account-icon {
+    position: fixed;
+    top: 20px; /* Posiziona l'icona in cima alla pagina */
+    right: 20px;
+    width: 80px; /* Dimensione dell'icona */
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.account-icon img {
+    width: 100%; /* Dimensione dell'immagine all'interno del contenitore */
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover; /* Assicura che l'immagine sia centrata */
+}
+
+.container {
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
 }
 
 .games {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
+    margin-top: 20px;
 }
 
 .game {
@@ -39,6 +70,13 @@ body {
     margin-top: auto; /* Spinge il pulsante verso il basso */
     font-size: 14px; /* Riduce la dimensione del pulsante */
     padding: 8px 16px; /* Riduce il padding del pulsante */
+}
+
+.games button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 audio#background-music {

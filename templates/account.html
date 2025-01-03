@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Account</h2>
+        <p>Welcome, {{ username }}!</p>
+        <table>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{ email }}</td>
+            </tr>
+            <tr>
+                <td>Balance</td>
+                <td>{{ balance }}</td>
+            </tr>
+            <!-- Aggiungi qui altri valori dell'account -->
+        </table>
+        <form id="delete-account-form" action="{{ url_for('delete_account') }}" method="post" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+            <input type="hidden" name="email" value="{{ email }}">
+            <button type="submit" class="btn">Delete Account</button>
+        </form>
+        <button class="return-btn" onclick="window.location.href='{{ url_for('casino_home', email=email) }}';">Return to Casino Home</button>
+    </div>
+    
+    <audio id="background-music" src="{{ url_for('static', filename='music/Invisible Cities.mp3') }}" controls loop hidden></audio>
+    
+    <script>
+        // Funzione per avviare la musica
+        function playBackgroundMusic() {
+            var backgroundMusic = document.getElementById('background-music');
+            if (backgroundMusic.paused) {
+                backgroundMusic.play().catch(function(error) {
+                    console.log('Autoplay was prevented:', error);
+                });
+            }
+        }
+
+        // Avvia la musica quando la pagina viene caricata
+        window.addEventListener('load', playBackgroundMusic);
+    </script>
+</body>
+</html>

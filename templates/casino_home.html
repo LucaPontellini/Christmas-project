@@ -1,11 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Casino Games</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/casino_home.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/casino_home.css') }}">
 </head>
 <body>
     <audio id="background-music" src="{{ url_for('static', filename='music/Jazzy Smile.mp3') }}" controls loop hidden></audio>
+    
+    <div class="account-icon">
+        <a href="{{ url_for('account', email=email) }}"> <!-- Passa l'email dell'utente -->
+            <img src="{{ url_for('static', filename='user_icon.png') }}" alt="Account Icon">
+        </a>
+    </div>
+    
     <div class="games">
         <!-- Giochi di Carte -->
         <div class="game">
@@ -214,10 +223,6 @@
             <img src="{{ url_for('static', filename='casino_games_photos/dream_catcher.jpg') }}" alt="Dream Catcher">
             <p>Dream Catcher</p>
             <button onclick="showErrorMessage('The selected game is not added yet.<br>It is under development.')">Play</button>
-        </div>
-
-        <div id="error-message" class="error-message" style="display: none;">
-            <p id="error-text"></p>
         </div>
 
         <!-- Giochi di Baccarat -->

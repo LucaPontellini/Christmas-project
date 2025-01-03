@@ -3,6 +3,7 @@ import os
 from flask import Flask, jsonify, render_template, redirect, url_for, request
 from flask_mail import Mail, Message
 import json
+import hashlib
 
 # Aggiungi il percorso relativo alla directory python_files
 sys.path.append(os.path.join(os.path.dirname(__file__), 'python_files'))
@@ -32,14 +33,11 @@ user_data = UserData(user_file_path)
 deck_data = DeckData(deck_file_path)
 
 def load_user_data():
-    if os.path.exists(user_file_path):
-        with open(user_file_path, 'r') as f:
-            return json.load(f)
-    else:
-        return {"users": {}}
+    with open('json/users.json', 'r') as f:
+        return json.load(f)
 
 def save_user_data(data):
-    with open(user_file_path, 'w') as f:
+    with open('json/users.json', 'w') as f:
         json.dump(data, f, indent=4)
 
 @app.route('/')
@@ -52,32 +50,36 @@ def return_to_welcome():
 
 @app.route('/casino_home')
 def casino_home():
-    return render_template('casino_home.html')
+    email = request.args.get('email')
+    return render_template('casino_home.html', email=email)
 
 @app.route('/return_to_casino_home')
 def return_to_casino_home():
-    return redirect(url_for('casino_home'))
+    email = request.args.get('email')
+    return redirect(url_for('casino_home', email=email))
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        user_id = request.form['email']
-        name = request.form['fname'] + ' ' + request.form['lname']
         email = request.form['email']
-        password = request.form['psw']
-        
+        name = request.form['name']
+        password = request.form['password']
         user_data = load_user_data()
         
-        if 'users' not in user_data: user_data['users'] = {}
-
-        if user_id in user_data['users']: return 'User already registered. Please use a different email or login.'
-
-        user_data['users'][user_id] = {
-            'name': name,
-            'email': email,
-            'password': password,
-            'is_admin': False,
-            'user_chips': {
+        if email in user_data['users']:
+            return jsonify({"error_message": "User already exists. Please login."})
+        
+        hashed_password = hash_password(password)
+        
+        user_data['users'][email] = {
+            "name": name,
+            "email": email,
+            "password": hashed_password,
+            "is_admin": False,
+            "user_chips": {
                 "white": 0,
                 "red": 0,
                 "blue": 0,
@@ -86,11 +88,12 @@ def register():
                 "purple": 0,
                 "yellow": 0,
                 "pink": 0,
-                "light blue": 0,
+                "light blue": 0
             },
-            'total_money': 0,
-            'remaining_money': 0
+            "total_money": 0,
+            "remaining_money": 0
         }
+        
         save_user_data(user_data)
         return redirect(url_for('login'))
     
@@ -99,21 +102,24 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_id = request.form['email']  # L'email è l'user_id 
-        password = request.form['psw']
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if not email or not password:
+            return 'Email and password are required'
         
         user_data = load_user_data()
         
-        if user_id in user_data['users'] and user_data['users'][user_id]['password'] == password:
-            if user_data['users'][user_id].get('is_admin', False):
-                response = redirect(url_for('admin_dashboard'))
-                response.set_cookie('username', user_id)
-                response.set_cookie('admin', 'true')
-            else:
+        if email in user_data['users']:
+            hashed_password = hash_password(password)
+            if user_data['users'][email]['password'] == hashed_password:
                 response = redirect(url_for('casino_home'))
-                response.set_cookie('username', user_id)
-            return response
-        else: return 'Invalid credentials'
+                response.set_cookie('username', email)
+                return response
+            else:
+                return 'Invalid credentials'
+        else:
+            return 'User not found'
     
     return render_template('login.html')
 
@@ -486,6 +492,29 @@ def registrations_json():
                 registrations[month] = 0
             registrations[month] += 1
     return jsonify(registrations)
+
+@app.route('/account')
+def account():
+    email = request.args.get('email')
+    user_data = load_user_data()
+    user_info = user_data['users'].get(email)
+    
+    if user_info:
+        return render_template('account.html', username=user_info['name'], email=email, balance=user_info['remaining_money'])
+    else:
+        return "User not found", 404
+
+@app.route('/delete_account', methods=['POST'])
+def delete_account():
+    email = request.form.get('email')
+    user_data = load_user_data()
+    
+    if email in user_data['users']:
+        del user_data['users'][email]
+        save_user_data(user_data)
+        return jsonify({"success_message": "Account deleted successfully."})
+    else:
+        return jsonify({"error_message": "User not found."})
 
 if __name__ == '__main__':
     app.run(debug=True)

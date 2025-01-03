@@ -3,21 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration</title>
+    <title>Register</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
 </head>
 <body>
     <form id="register-form" action="/register" class="container" method="post">
-        <h2 style="text-align: center;"><b>Registration</b></h2> <!-- Scritta Registration in grassetto e centrata -->
+        <h2 style="text-align: center;"><b>Register</b></h2> <!-- Scritta Register in grassetto e centrata -->
         
         <div class="input-container">
             <img src="{{ url_for('static', filename='user_icon.png') }}" alt="User Icon" style="width:30px;height:30px;">
-            <input type="text" placeholder="First Name" name="fname" required>
-        </div>
-        
-        <div class="input-container">
-            <img src="{{ url_for('static', filename='user_icon.png') }}" alt="User Icon" style="width:30px;height:30px;">
-            <input type="text" placeholder="Last Name" name="lname" required>
+            <input type="text" placeholder="Name" name="name" required>
         </div>
         
         <div class="input-container">
@@ -27,20 +22,11 @@
         
         <div class="input-container">
             <img src="{{ url_for('static', filename='lock_icon.png') }}" alt="Lock Icon" style="width:30px;height:30px;">
-            <input type="password" placeholder="Password" name="psw" required>
+            <input type="password" placeholder="Password" name="password" required>
         </div>
         
         <button type="submit" class="btn">Register</button>
-        <a href="{{ url_for('forgot_password') }}" class="forgot-password-link">Forgot password?</a><br>
-
-        <button type="button" class="btn" style="margin-top: 20px;" onclick="window.location.href='{{ url_for('login') }}'">Already have an account? Login</button>
-        <button type="button" class="btn" style="margin-top: 20px;" onclick="window.location.href='{{ url_for('casino_home') }}'">Exit</button>
-        
-        <div style="margin-top: 20px;">
-            <a href="https://www.facebook.com/login"><img src="{{ url_for('static', filename='facebook_icon.png') }}" alt="Facebook Icon" style="width:30px;height:30px;"></a>
-            <a href="https://twitter.com/login"><img src="{{ url_for('static', filename='twitter_icon.png') }}" alt="Twitter Icon" style="width:30px;height:30px;"></a>
-            <a href="https://accounts.google.com/signin"><img src="{{ url_for('static', filename='google_icon.png') }}" alt="Google Icon" style="width:30px;height:30px;"></a>
-        </div>
+        <button type="button" class="btn" style="margin-top: 20px;" onclick="window.location.href='{{ url_for('login') }}'">Back to Login</button>
     </form>
 
     <audio id="background-music" src="{{ url_for('static', filename='music/Invisible Cities.mp3') }}" controls loop hidden></audio>
@@ -86,13 +72,6 @@
 
         // Avvia la musica quando la pagina viene caricata
         window.addEventListener('load', playBackgroundMusic);
-
-        // Rileva quando l'utente torna indietro e reindirizza alla pagina return_to_casino_home.html
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted) {
-                window.location.href = 'return_to_casino_home.html';
-            }
-        });
 
         // Imposta i messaggi di errore personalizzati in inglese
         document.querySelectorAll('input[required]').forEach(function(input) {
