@@ -20,16 +20,68 @@
                 <td>{{ email }}</td>
             </tr>
             <tr>
-                <td>Balance</td>
-                <td>{{ balance }}</td>
+                <td>Total Money</td>
+                <td>{{ total_money }}</td>
             </tr>
-            <!-- Aggiungi qui altri valori dell'account -->
+            <tr>
+                <td>Remaining Money</td>
+                <td>{{ remaining_money }}</td>
+            </tr>
+            <tr>
+                <td>White Chips</td>
+                <td>{{ user_chips.white }}</td>
+            </tr>
+            <tr>
+                <td>Red Chips</td>
+                <td>{{ user_chips.red }}</td>
+            </tr>
+            <tr>
+                <td>Blue Chips</td>
+                <td>{{ user_chips.blue }}</td>
+            </tr>
+            <tr>
+                <td>Green Chips</td>
+                <td>{{ user_chips.green }}</td>
+            </tr>
+            <tr>
+                <td>Black Chips</td>
+                <td>{{ user_chips.black }}</td>
+            </tr>
+            <tr>
+                <td>Purple Chips</td>
+                <td>{{ user_chips.purple }}</td>
+            </tr>
+            <tr>
+                <td>Yellow Chips</td>
+                <td>{{ user_chips.yellow }}</td>
+            </tr>
+            <tr>
+                <td>Pink Chips</td>
+                <td>{{ user_chips.pink }}</td>
+            </tr>
+            <tr>
+                <td>Light Blue Chips</td>
+                <td>{{ user_chips.light_blue }}</td>
+            </tr>
         </table>
-        <form id="delete-account-form" action="{{ url_for('delete_account') }}" method="post" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
-            <input type="hidden" name="email" value="{{ email }}">
-            <button type="submit" class="btn">Delete Account</button>
-        </form>
-        <button class="return-btn" onclick="window.location.href='{{ url_for('casino_home', email=email) }}';">Return to Casino Home</button>
+        <button class="btn delete-btn" onclick="showDeleteAccountModal()">Delete Account</button>
+        <button class="btn return-btn" onclick="window.location.href='{{ url_for('casino_home', email=email) }}';">Return to Casino Home</button>
+    </div>
+    
+    <div id="delete-account-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDeleteAccountModal()">&times;</span>
+            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+            <form id="delete-account-form" action="{{ url_for('delete_account') }}" method="post">
+                <input type="hidden" name="email" value="{{ email }}">
+                <button type="submit" class="btn delete-btn">Confirm</button>
+                <button type="button" class="btn cancel-btn" onclick="closeDeleteAccountModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="error-message" class="error-message" style="display: none;">
+        <p id="error-text"></p>
     </div>
     
     <audio id="background-music" src="{{ url_for('static', filename='music/Invisible Cities.mp3') }}" controls loop hidden></audio>
@@ -47,6 +99,36 @@
 
         // Avvia la musica quando la pagina viene caricata
         window.addEventListener('load', playBackgroundMusic);
+
+        // Rileva quando l'utente torna indietro e riprende la riproduzione della musica
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                playBackgroundMusic();
+            }
+        });
+
+        // Funzione per mostrare un messaggio di errore
+        function showErrorMessage(message) {
+            var errorMessage = document.getElementById('error-message');
+            var errorText = document.getElementById('error-text');
+            errorText.innerHTML = message;
+            errorMessage.style.display = 'block';
+            setTimeout(function() {
+                errorMessage.style.display = 'none';
+            }, 5000); // Nasconde il messaggio dopo 5 secondi
+        }
+
+        // Funzione per mostrare il modale di conferma eliminazione account
+        function showDeleteAccountModal() {
+            var modal = document.getElementById('delete-account-modal');
+            modal.style.display = 'block';
+        }
+
+        // Funzione per chiudere il modale di conferma eliminazione account
+        function closeDeleteAccountModal() {
+            var modal = document.getElementById('delete-account-modal');
+            modal.style.display = 'none';
+        }
     </script>
 </body>
 </html>

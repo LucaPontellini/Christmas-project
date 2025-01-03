@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta names="viewport" content="width=device-width, initial-scales=1.0">
     <title>Casino Home</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/casino_home.css') }}">
 </head>
@@ -10,7 +10,7 @@
     <audio id="background-music" src="{{ url_for('static', filename='music/Jazzy Smile.mp3') }}" controls loop hidden></audio>
     
     <div class="account-icon">
-        <a href="{{ url_for('account', email=email) }}"> <!-- Passa l'email dell'utente -->
+        <a href="#" id="account-link">
             <img src="{{ url_for('static', filename='user_icon.png') }}" alt="Account Icon">
         </a>
     </div>
@@ -310,31 +310,60 @@
         function playBackgroundMusic() {
             var backgroundMusic = document.getElementById('background-music');
             if (backgroundMusic.paused) {
-                backgroundMusic.play();
+                backgroundMusic.play().catch(function(error) {
+                    console.log('Autoplay was prevented:', error);
+                });
             }
         }
 
         // Avvia la musica quando la pagina viene caricata
         window.addEventListener('load', playBackgroundMusic);
 
-        // Rileva quando l'utente torna indietro e reindirizza alla pagina return_to_casino_home.html
+        // Rileva quando l'utente torna indietro e riprende la riproduzione della musica
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
-                window.location.href = 'return_to_casino_home.html';
+                playBackgroundMusic();
             }
         });
 
-        // Mostra il messaggio di errore
+        // Funzione per mostrare un messaggio di errore
         function showErrorMessage(message) {
-            document.getElementById('error-text').innerHTML = message;
-            document.getElementById('error-message').style.display = 'block';
-            setTimeout(hideErrorMessage, 5000); // Nasconde il messaggio dopo 5 secondi
+            var errorMessage = document.getElementById('error-message');
+            var errorText = document.getElementById('error-text');
+            errorText.innerHTML = message;
+            errorMessage.style.display = 'block';
+            setTimeout(function() {
+                errorMessage.style.display = 'none';
+            }, 5000); // Nasconde il messaggio dopo 5 secondi
         }
 
-        // Nasconde il messaggio di errore
-        function hideErrorMessage() {
-            document.getElementById('error-message').style.display = 'none';
+        // Funzione per mostrare un messaggio di errore e reindirizzare alla pagina di registrazione
+        function showErrorMessageAndRedirect(message) {
+            var errorMessage = document.getElementById('error-message');
+            var errorText = document.getElementById('error-text');
+            errorText.innerHTML = message;
+            errorMessage.style.display = 'block';
+            setTimeout(function() {
+                errorMessage.style.display = 'none';
+                window.location.href = "{{ url_for('register') }}";
+            }, 5000); // Nasconde il messaggio dopo 5 secondi e reindirizza alla pagina di registrazione
         }
+
+        // Controllo per verificare l'accesso all'account
+        window.addEventListener('load', function() {
+            var email = "{{ email }}";
+            var isAdmin = "{{ is_admin }}";
+            var accountLink = document.getElementById('account-link');
+            
+            if (email || isAdmin === 'True') {
+                accountLink.href = "{{ url_for('account', email=email) }}";
+            } else {
+                accountLink.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    showErrorMessageAndRedirect('You must be logged in to access the account.');
+                });
+            }
+        });
     </script>
 </body>
 </html>

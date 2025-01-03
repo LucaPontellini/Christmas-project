@@ -5,6 +5,9 @@ from flask_mail import Mail, Message
 import json
 import hashlib
 
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
 # Aggiungi il percorso relativo alla directory python_files
 sys.path.append(os.path.join(os.path.dirname(__file__), 'python_files'))
 from user_data import UserData
@@ -33,11 +36,14 @@ user_data = UserData(user_file_path)
 deck_data = DeckData(deck_file_path)
 
 def load_user_data():
-    with open('json/users.json', 'r') as f:
-        return json.load(f)
+    try:
+        with open(user_file_path, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {"users": {}}
 
 def save_user_data(data):
-    with open('json/users.json', 'w') as f:
+    with open(user_file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
 @app.route('/')
@@ -55,47 +61,41 @@ def casino_home():
 
 @app.route('/return_to_casino_home')
 def return_to_casino_home():
-    email = request.args.get('email')
-    return redirect(url_for('casino_home', email=email))
-
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+    return redirect(url_for('casino_home'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         email = request.form['email']
-        name = request.form['name']
         password = request.form['password']
+        name = request.form['name']
         user_data = load_user_data()
         
         if email in user_data['users']:
-            return jsonify({"error_message": "User already exists. Please login."})
-        
-        hashed_password = hash_password(password)
+            return redirect(url_for('login'))
         
         user_data['users'][email] = {
-            "name": name,
-            "email": email,
-            "password": hashed_password,
-            "is_admin": False,
-            "user_chips": {
-                "white": 0,
-                "red": 0,
-                "blue": 0,
-                "green": 0,
-                "black": 0,
-                "purple": 0,
-                "yellow": 0,
-                "pink": 0,
-                "light blue": 0
+            'name': name,
+            'email': email,
+            'password': hash_password(password),
+            'is_admin': False,
+            'user_chips': {
+                'white': 0,
+                'red': 0,
+                'blue': 0,
+                'green': 0,
+                'black': 0,
+                'purple': 0,
+                'yellow': 0,
+                'pink': 0,
+                'light blue': 0
             },
-            "total_money": 0,
-            "remaining_money": 0
+            'total_money': 0,
+            'remaining_money': 0
         }
         
         save_user_data(user_data)
-        return redirect(url_for('login'))
+        return redirect(url_for('casino_home', email=email))
     
     return render_template('register.html')
 
@@ -476,8 +476,11 @@ def admin_dashboard():
 
 @app.route('/earnings_json')
 def earnings_json():
-    with open('json/earnings.json', 'r') as f:
-        earnings_data = json.load(f)
+    try:
+        with open('json/earnings.json', 'r') as f:
+            earnings_data = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        earnings_data = {}
     return jsonify(earnings_data)
 
 @app.route('/registrations_json')
@@ -496,13 +499,21 @@ def registrations_json():
 @app.route('/account')
 def account():
     email = request.args.get('email')
+    if not email:
+        return redirect(url_for('register'))
+    
     user_data = load_user_data()
     user_info = user_data['users'].get(email)
     
     if user_info:
-        return render_template('account.html', username=user_info['name'], email=email, balance=user_info['remaining_money'])
+        return render_template('account.html', 
+                               username=user_info['name'], 
+                               email=email, 
+                               total_money=user_info['total_money'], 
+                               remaining_money=user_info['remaining_money'], 
+                               user_chips=user_info['user_chips'])
     else:
-        return "User not found", 404
+        return redirect(url_for('register'))
 
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
