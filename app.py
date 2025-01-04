@@ -130,12 +130,13 @@ def login():
 def forgot_password():
     if request.method == 'POST':
         email = request.form['email']
-        token = password_manager.generate_reset_token(email)
-        if token:
-            reset_link = url_for('reset_password', token=token, _external=True)
-            return render_template('forgot_password.html', success_message=f'Reset link: {reset_link}')
-        else:
-            return render_template('forgot_password.html', error_message='Email not found.')
+        user_data = load_user_data()
+        if email in user_data['users']:
+            token = password_manager.generate_reset_token(email)
+            if token:
+                reset_link = url_for('reset_password', token=token, _external=True)
+                return render_template('forgot_password.html', success_message=f'Reset link: {reset_link}')
+        return render_template('forgot_password.html', error_message='Email not found.')
     
     return render_template('forgot_password.html')
 
@@ -152,30 +153,6 @@ def reset_password(token):
 @app.route('/poker_rules')
 def poker_rules():
     return render_template('poker_rules.html')
-
-@app.route('/cashier_operations', methods=['GET', 'POST'])
-def cashier_dashboard():
-    user_id = request.cookies.get('username')
-    
-    if not user_id: return redirect(url_for('register'))
-    
-    user_data = load_user_data()
-    user = user_data['users'].get(user_id)
-    
-    if not user: return redirect(url_for('register'))
-    
-    total_money = user['total_money']
-    remaining_money = user['remaining_money']
-    
-    if request.method == 'POST':
-        total_money = request.form.get('total_money', type=int, default=total_money)
-        remaining_money = request.form.get('remaining_money', type=int, default=remaining_money)
-    
-    return render_template(
-        'cashier_operations.html',
-        value_of_chips=chips_data()["value_of_chips"],
-        total_money=total_money,
-        remaining_money=remaining_money)
 
 @app.route('/convert_to_chips', methods=['POST'])
 def convert_to_chips():
@@ -335,38 +312,30 @@ def clear_all_data():
         "remaining_money": user["remaining_money"]})
 
 @app.route('/cashier_dashboard', methods=['GET', 'POST'])
-def cashier_dashboard_page():
-    user_id = request.cookies.get('username')
+def cashier_dashboard():
+    email = request.cookies.get('email')
     
-    if not user_id: return redirect(url_for('register'))
+    if not email: 
+        return redirect(url_for('register'))
     
     user_data = load_user_data()
-    user = user_data['users'].get(user_id)
+    user = user_data['users'].get(email)
     
-    if not user: return 'User not found'
+    if not user: 
+        return redirect(url_for('register'))
     
-    if request.method == "POST":
-        new_total_money_str = request.form.get("total_money", "")
-        if new_total_money_str.strip():
-            new_total_money = int(new_total_money_str)
-        else: new_total_money = 0
-
-        difference = new_total_money - user["total_money"]
-
-        user["remaining_money"] += difference
-        user["total_money"] = new_total_money
-
-        save_user_data(user_data)
-        return redirect(url_for("cashier_dashboard_page"))
-    else:
-        value_of_chips = chips_data().get("value_of_chips", {})
-        total_money = user.get("total_money", 0)
-        remaining_money = user.get("remaining_money", 0)
-        return render_template(
-            "cashier_operations.html",
-            value_of_chips=value_of_chips,
-            total_money=total_money,
-            remaining_money=remaining_money)
+    total_money = user['total_money']
+    remaining_money = user['remaining_money']
+    
+    if request.method == 'POST':
+        total_money = request.form.get('total_money', type=int, default=total_money)
+        remaining_money = request.form.get('remaining_money', type=int, default=remaining_money)
+    
+    return render_template(
+        'cashier_operations.html',
+        value_of_chips=chips_data()["value_of_chips"],
+        total_money=total_money,
+        remaining_money=remaining_money)
 
 #Funzione per la rotta '/reconvert'
 @app.route("/reconvert", methods=["POST"])
@@ -416,29 +385,26 @@ def convert_back(chips_dict, value_of_chips):
         total_money += number * chip_value
     return total_money
 
-#Funzione per la rotta '/user_dashboard'
-@app.route("/user_dashboard")
+# Funzione per la rotta '/user_dashboard'
+@app.route('/user_dashboard')
 def user_dashboard():
-    user_id = request.cookies.get('username')
-    
-    if not user_id: return redirect(url_for('register'))
+    email = request.cookies.get('email')
+    if not email:
+        return redirect(url_for('login'))
     
     user_data = load_user_data()
-    user = user_data['users'].get(user_id)
+    user_info = user_data['users'].get(email)
     
-    if not user: return 'User not found'
-    
-    user_chips = user["user_chips"]
-    total_money = user["total_money"]
-    remaining_money = user["remaining_money"]
-    value_of_chips = chips_data()["value_of_chips"]
-
-    return render_template(
-        "user_dashboard.html",
-        user_chips=user_chips,
-        total_money=total_money,
-        remaining_money=remaining_money,
-        value_of_chips=value_of_chips)
+    if user_info:
+        return render_template('user_dashboard.html', 
+                               username=user_info['name'], 
+                               email=email, 
+                               total_money=user_info['total_money'], 
+                               remaining_money=user_info['remaining_money'], 
+                               user_chips=user_info['user_chips'],
+                               value_of_chips=chips_data()["value_of_chips"])
+    else:
+        return redirect(url_for('register'))
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
