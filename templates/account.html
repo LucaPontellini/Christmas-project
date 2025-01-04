@@ -3,96 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">
+    <title>Account Details</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h2>Account Details</h2>
-        <table>
-            <tr>
-                <td>Name</td>
-                <td>{{ username }}</td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td>{{ email }}</td>
-            </tr>
-            <tr>
-                <td>Total Money</td>
-                <td>{{ total_money }}</td>
-            </tr>
-            <tr>
-                <td>Remaining Money</td>
-                <td>{{ remaining_money }}</td>
-            </tr>
-            <tr>
-                <td>White Chips</td>
-                <td>{{ user_chips.white }}</td>
-            </tr>
-            <tr>
-                <td>Red Chips</td>
-                <td>{{ user_chips.red }}</td>
-            </tr>
-            <tr>
-                <td>Blue Chips</td>
-                <td>{{ user_chips.blue }}</td>
-            </tr>
-            <tr>
-                <td>Green Chips</td>
-                <td>{{ user_chips.green }}</td>
-            </tr>
-            <tr>
-                <td>Black Chips</td>
-                <td>{{ user_chips.black }}</td>
-            </tr>
-            <tr>
-                <td>Purple Chips</td>
-                <td>{{ user_chips.purple }}</td>
-            </tr>
-            <tr>
-                <td>Yellow Chips</td>
-                <td>{{ user_chips.yellow }}</td>
-            </tr>
-            <tr>
-                <td>Pink Chips</td>
-                <td>{{ user_chips.pink }}</td>
-            </tr>
-            <tr>
-                <td>Light Blue Chips</td>
-                <td>{{ user_chips.light_blue }}</td>
-            </tr>
-        </table>
-        <button class="btn delete-btn" onclick="showDeleteAccountModal()">Delete Account</button>
-        <button class="btn return-btn" onclick="window.location.href='{{ url_for('casino_home', email=email) }}';">Return to Casino Home</button>
-    </div>
-    
-    <div id="delete-account-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeDeleteAccountModal()">&times;</span>
-            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-            <form id="delete-account-form" action="{{ url_for('delete_account') }}" method="post">
-                <input type="hidden" name="email" value="{{ email }}">
-                <button type="submit" class="btn delete-btn">Delete</button>
-                <button type="button" class="btn cancel-btn" onclick="closeDeleteAccountModal()">Cancel</button>
-            </form>
-        </div>
-    </div>
-    
-    <div id="error-message" class="error-message" style="display: none;">
-        <p id="error-text"></p>
-    </div>
-    
+    <!-- Elemento audio per la musica -->
     <audio id="background-music" src="{{ url_for('static', filename='music/Invisible Cities.mp3') }}" controls loop hidden></audio>
-    
+
+    <div class="container">
+        <header>
+            <h2>Account Details</h2>
+        </header>
+        <main>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <td>{{ username }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{ email }}</td>
+                </tr>
+                <tr>
+                    <th>Password</th>
+                    <td>
+                        <div class="input-container large-input">
+                            <input type="password" id="password" value="{{ user_data['password'] }}" readonly>
+                            <img src="{{ url_for('static', filename='eye_closed.jpeg') }}" alt="Toggle Visibility" class="toggle-password" onclick="toggleVisibility('password', this)">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Payment Method</th>
+                    <td>
+                        <div class="input-container large-input">
+                            <input type="password" id="payment-method" value="{{ user_data['payment_method'] }}" readonly>
+                            <img src="{{ url_for('static', filename='eye_closed.jpeg') }}" alt="Toggle Visibility" class="toggle-password" onclick="toggleVisibility('payment-method', this)">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Total Money</th>
+                    <td>${{ total_money }}</td>
+                </tr>
+                <tr>
+                    <th>Remaining Money</th>
+                    <td>${{ remaining_money }}</td>
+                </tr>
+                {% for chip_color, quantity in user_chips.items() %}
+                <tr>
+                    <th>{{ chip_color | capitalize }} Chips</th>
+                    <td>{{ quantity }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <div class="button-container">
+                <!-- Pulsante per tornare alla home del casino -->
+                <form action="{{ url_for('casino_home') }}" method="get">
+                    <input type="submit" value="Back to Casino Home" class="btn return-btn">
+                </form>
+
+                <!-- Pulsante per tornare alla dashboard dell'utente -->
+                <form action="{{ url_for('user_dashboard') }}" method="get">
+                    <input type="submit" value="Back to User Dashboard" class="btn return-btn">
+                </form>
+
+                <!-- Pulsante per eliminare l'account -->
+                <button class="btn delete-btn" onclick="showDeleteAccountModal()">Delete Account</button>
+
+                <!-- Pulsante per uscire dall'account -->
+                <form action="{{ url_for('logout') }}" method="get">
+                    <input type="submit" value="Logout" class="btn logout-btn">
+                </form>
+            </div>
+
+            <!-- Modale di conferma eliminazione account -->
+            <div id="delete-account-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeDeleteAccountModal()">&times;</span>
+                    <p>Are you sure you want to delete your account?</p>
+                    <div class="modal-buttons">
+                        <form action="{{ url_for('delete_account') }}" method="post">
+                            <input type="hidden" name="email" value="{{ email }}">
+                            <input type="submit" value="Yes, delete my account" class="btn delete-btn">
+                        </form>
+                        <button class="btn cancel-btn" onclick="closeDeleteAccountModal()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error-message" class="error-message">
+                <p id="error-text"></p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Script JavaScript per il controllo del modale e dei messaggi di errore -->
     <script>
         // Funzione per avviare la musica
         function playBackgroundMusic() {
             var backgroundMusic = document.getElementById('background-music');
             if (backgroundMusic.paused) {
-                backgroundMusic.play().catch(function(error) {
-                    console.log('Autoplay was prevented:', error);
-                });
+                backgroundMusic.play();
             }
         }
 
@@ -127,6 +140,18 @@
         function closeDeleteAccountModal() {
             var modal = document.getElementById('delete-account-modal');
             modal.style.display = 'none';
+        }
+
+        // Funzione per mostrare o nascondere la password e il metodo di pagamento
+        function toggleVisibility(id, element) {
+            var input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+                element.src = "{{ url_for('static', filename='eye_open.jpeg') }}";
+            } else {
+                input.type = "password";
+                element.src = "{{ url_for('static', filename='eye_closed.jpeg') }}";
+            }
         }
     </script>
 </body>

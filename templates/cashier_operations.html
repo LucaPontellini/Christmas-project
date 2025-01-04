@@ -13,9 +13,9 @@
     <div class="overlay"></div>
     <div class="content-wrapper">
         <header>
-            <h1>Welcome to the Cashier!</h1>
-            <form action="/casino_home">
-                <input type="submit" value="Go to Casino Home">
+            <h1>Welcome to the cashier, {{ username }}!</h1>
+            <form action="{{ url_for('casino_home') }}" method="get">
+                <input type="submit" value="Back to Casino Home">
             </form>
         </header>
         <main>
@@ -88,10 +88,10 @@
             
             <section>
                 <!-- Form per la conversione da denaro a fiches -->
-                <form action="/convert_to_chips" method="post" onsubmit="return handleFormSubmit(event, this)">
+                <form id="convert-form" action="{{ url_for('convert_to_chips') }}" method="post" onsubmit="return handleFormSubmit(event, this)">
                     <label for="amount">Enter the amount to convert to chips:</label>
-                    <input type="number" id="amount" name="amount" min="0"><br>
-                    <select id="chip-color" name="chip-color" class="chip-select">
+                    <input type="number" id="amount" name="amount" min="0" required><br>
+                    <select id="chip-color" name="chip-color" class="chip-select" required>
                         <option value="" disabled selected>Select the color of chips you want:</option>
                         <option value="white">white</option>
                         <option value="red">red</option>
@@ -199,6 +199,17 @@
             .catch(error => console.error('Error:', error));
             return false;
         }
+
+        // Imposta i messaggi di errore personalizzati in inglese
+        document.querySelectorAll('input[required], select[required]').forEach(function(input) {
+            input.addEventListener('invalid', function(event) {
+                event.target.setCustomValidity('Please select an item from the list.');
+            });
+
+            input.addEventListener('input', function(event) {
+                event.target.setCustomValidity('');
+            });
+        });
 
         // Funzione per mostrare il messaggio di errore
         function showErrorMessage(message) {
