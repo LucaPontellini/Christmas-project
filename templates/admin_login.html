@@ -11,6 +11,9 @@
         <h2>Admin Login</h2>
         <input type="password" name="access_code" placeholder="Access Code" required>
         <button type="submit">Login</button>
+        {% if error_message %}
+        <p class="error-message">{{ error_message }}</p>
+        {% endif %}
     </form>
 </body>
 </html>

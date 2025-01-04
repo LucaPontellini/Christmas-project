@@ -1,12 +1,10 @@
 import sys
 import os
-from flask import Flask, jsonify, render_template, redirect, url_for, request
+from flask import Flask, jsonify, render_template, redirect, url_for, request, make_response
 from flask_mail import Mail, Message
 import json
 import hashlib
-
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+from admin_data import verify_admin
 
 # Aggiungi il percorso relativo alla directory python_files
 sys.path.append(os.path.join(os.path.dirname(__file__), 'python_files'))
@@ -46,6 +44,9 @@ def save_user_data(data):
     with open(user_file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
 @app.route('/')
 def welcome():
     return render_template('welcome.html')
@@ -56,8 +57,9 @@ def return_to_welcome():
 
 @app.route('/casino_home')
 def casino_home():
-    email = request.args.get('email')
-    return render_template('casino_home.html', email=email)
+    email = request.cookies.get('email')
+    is_admin = request.cookies.get('is_admin')
+    return render_template('casino_home.html', email=email, is_admin=is_admin)
 
 @app.route('/return_to_casino_home')
 def return_to_casino_home():
@@ -95,31 +97,28 @@ def register():
         }
         
         save_user_data(user_data)
-        return redirect(url_for('casino_home', email=email))
+        response = make_response(redirect(url_for('casino_home')))
+        response.set_cookie('email', email)
+        response.set_cookie('is_admin', 'False')
+        return response
     
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        
-        if not email or not password:
-            return 'Email and password are required'
-        
+        email = request.form['email']
+        password = request.form['password']
         user_data = load_user_data()
         
-        if email in user_data['users']:
-            hashed_password = hash_password(password)
-            if user_data['users'][email]['password'] == hashed_password:
-                response = redirect(url_for('casino_home'))
-                response.set_cookie('username', email)
-                return response
-            else:
-                return 'Invalid credentials'
+        user = user_data['users'].get(email)
+        if user and user['password'] == hash_password(password):
+            response = make_response(redirect(url_for('casino_home')))
+            response.set_cookie('email', email)
+            response.set_cookie('is_admin', str(user['is_admin']))
+            return response
         else:
-            return 'User not found'
+            return render_template('login.html', error_message='Invalid email or password.')
     
     return render_template('login.html')
 
@@ -452,22 +451,26 @@ def user_dashboard():
         remaining_money=remaining_money,
         value_of_chips=value_of_chips)
 
-@app.route('/admin_login', methods=['GET', 'POST'])
+@app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
-        access_code = request.form['access_code']
-        if access_code == 'your_admin_access_code':  # Sostituisci con il vero codice di accesso
-            response = redirect(url_for('admin_dashboard'))
+        email = request.form['email']
+        password = request.form['password']
+        
+        if verify_admin(email, password):
+            response = make_response(redirect(url_for('admin_dashboard')))
             response.set_cookie('admin', 'true')
+            response.set_cookie('email', email)
             return response
         else:
-            return 'Invalid access code'
+            return render_template('admin_login.html', error_message='Invalid email or password.')
+    
     return render_template('admin_login.html')
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if request.cookies.get('admin') != 'true':
-        return redirect(url_for('login'))
+        return redirect(url_for('admin_login'))
     
     user_data = load_user_data()
     users = user_data['users']
@@ -488,30 +491,36 @@ def registrations_json():
     user_data = load_user_data()
     registrations = {}
     for user_id, user_info in user_data['users'].items():
-        registration_date = user_info.get('registration_date')
-        if registration_date:
-            month = registration_date.split('-')[1]
-            if month not in registrations:
-                registrations[month] = 0
-            registrations[month] += 1
+        if not user_info['is_admin']:  # Escludi gli amministratori dal conteggio delle registrazioni
+            registration_date = user_info.get('registration_date')
+            if registration_date:
+                month = registration_date.split('-')[1]
+                if month not in registrations:
+                    registrations[month] = 0
+                registrations[month] += 1
     return jsonify(registrations)
 
 @app.route('/account')
 def account():
-    email = request.args.get('email')
+    email = request.cookies.get('email')
     if not email:
-        return redirect(url_for('register'))
+        return redirect(url_for('login'))
     
     user_data = load_user_data()
     user_info = user_data['users'].get(email)
     
     if user_info:
-        return render_template('account.html', 
-                               username=user_info['name'], 
-                               email=email, 
-                               total_money=user_info['total_money'], 
-                               remaining_money=user_info['remaining_money'], 
-                               user_chips=user_info['user_chips'])
+        if user_info['is_admin']:
+            return render_template('admin_account.html', 
+                                   username=user_info['name'], 
+                                   email=email)
+        else:
+            return render_template('account.html', 
+                                   username=user_info['name'], 
+                                   email=email, 
+                                   total_money=user_info['total_money'], 
+                                   remaining_money=user_info['remaining_money'], 
+                                   user_chips=user_info['user_chips'])
     else:
         return redirect(url_for('register'))
 
@@ -523,7 +532,10 @@ def delete_account():
     if email in user_data['users']:
         del user_data['users'][email]
         save_user_data(user_data)
-        return jsonify({"success_message": "Account deleted successfully."})
+        response = make_response(jsonify({"success_message": "Account deleted successfully."}))
+        response.delete_cookie('email')
+        response.delete_cookie('is_admin')
+        return response
     else:
         return jsonify({"error_message": "User not found."})
 
