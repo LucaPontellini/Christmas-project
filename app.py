@@ -1,37 +1,33 @@
 import sys
 import os
 from flask import Flask, jsonify, render_template, redirect, url_for, request, make_response
-from flask_mail import Mail, Message
 import json
 import hashlib
-from admin_data import verify_admin
 
-# Aggiungi il percorso relativo alla directory python_files
+#Percorso relativo alla directory python_files
 sys.path.append(os.path.join(os.path.dirname(__file__), 'python_files'))
+
 from user_data import UserData
 from get_data_from_JSON import chips_data
 from deck_data import DeckData
+from admin_data import AdminData
+from password_manager import PasswordManager
 
 app = Flask(__name__)
 
-# Configurazione di Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp.example.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'your_email@example.com'
-app.config['MAIL_PASSWORD'] = 'your_email_password'
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-
-mail = Mail(app)
-
-# Percorso del file JSON degli utenti
+#Percorso del file JSON degli utenti
 user_file_path = os.path.join(os.path.dirname(__file__), 'json', 'users.json')
 
-# Percorso del file JSON del mazzo di carte
+#Percorso del file JSON del mazzo di carte
 deck_file_path = os.path.join(os.path.dirname(__file__), 'json', 'deck_into_json.json')
+
+#Percorso del file JSON degli amministratori
+admin_file_path = os.path.join(os.path.dirname(__file__), 'json', 'admin.json')
 
 user_data = UserData(user_file_path)
 deck_data = DeckData(deck_file_path)
+admin_data_instance = AdminData(admin_file_path)
+password_manager = PasswordManager(user_file_path)
 
 def load_user_data():
     try:
@@ -46,6 +42,9 @@ def save_user_data(data):
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
+
+def create_admin_if_not_exists():
+    admin_data_instance.create_admin_if_not_exists('admin@lucapontellini.com', 'Gp!7fhD^*3nVq9E')
 
 @app.route('/')
 def welcome():
@@ -117,6 +116,11 @@ def login():
             response.set_cookie('email', email)
             response.set_cookie('is_admin', str(user['is_admin']))
             return response
+        elif admin_data_instance.verify_admin(email, password):
+            response = make_response(redirect(url_for('admin_dashboard')))
+            response.set_cookie('email', email)
+            response.set_cookie('is_admin', 'True')
+            return response
         else:
             return render_template('login.html', error_message='Invalid email or password.')
     
@@ -126,39 +130,24 @@ def login():
 def forgot_password():
     if request.method == 'POST':
         email = request.form['email']
-        user_data = load_user_data()
-        
-        # Controllo nel file JSON per verificare se l'utente esiste
-        if email not in user_data['users']:
-            return jsonify({"error_message": "User not found. Please check your email or register for an account."})
-        
-        # Procedi con il recupero della password (ad esempio, invia un'email con un link per resettare la password)
-        reset_link = url_for('reset_password', email=email, _external=True)
-        email_body = f"Click the following link to reset your password: {reset_link}"
-        
-        msg = Message('Password Reset Request', sender='your_email@example.com', recipients=[email])
-        msg.body = email_body
-        try:
-            mail.send(msg)
-            return jsonify({"success_message": "Password reset instructions have been sent to your email."})
-        except Exception as e:
-            return jsonify({"error_message": f"Failed to send email: {e}"})
+        token = password_manager.generate_reset_token(email)
+        if token:
+            reset_link = url_for('reset_password', token=token, _external=True)
+            return render_template('forgot_password.html', success_message=f'Reset link: {reset_link}')
+        else:
+            return render_template('forgot_password.html', error_message='Email not found.')
+    
     return render_template('forgot_password.html')
 
-@app.route('/reset_password', methods=['GET', 'POST'])
-def reset_password():
-    email = request.args.get('email')
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
     if request.method == 'POST':
         new_password = request.form['new_password']
-        user_data = load_user_data()
-        
-        if email in user_data['users']:
-            user_data['users'][email]['password'] = new_password
-            save_user_data(user_data)
+        if password_manager.reset_password(token, new_password):
             return redirect(url_for('login'))
         else:
-            return 'User not found'
-    return render_template('reset_password.html', email=email)
+            return redirect(url_for('forgot_password'))
+    return render_template('reset_password.html', token=token)
 
 @app.route('/poker_rules')
 def poker_rules():
@@ -310,19 +299,19 @@ def clear_all_data():
     
     if not user: return jsonify({"error_message": "User not found."})
     
-    # Verifica se il denaro totale è zero
+    #Verifica se il denaro totale è zero
     total_money_is_zero = user["total_money"] == 0
     
-    # Verifica se il denaro rimanente è zero
+    #Verifica se il denaro rimanente è zero
     remaining_money_is_zero = user["remaining_money"] == 0
     
-    # Verifica se tutte le quantità di fiches sono zero
+    #Verifica se tutte le quantità di fiches sono zero
     all_chips_are_zero = all(quantity == 0 for quantity in user["user_chips"].values())
     
-    # Se tutte le condizioni sono vere, non c'è nulla da eliminare
+    #Se tutte le condizioni sono vere, non c'è nulla da eliminare
     if total_money_is_zero and remaining_money_is_zero and all_chips_are_zero: return jsonify({"error_message": "There is no data to clear."})
     
-    # Procedi con la cancellazione dei dati
+    #Procedi con la cancellazione dei dati
     user["user_chips"] = {
         "white": 0,
         "red": 0,
@@ -379,7 +368,7 @@ def cashier_dashboard_page():
             total_money=total_money,
             remaining_money=remaining_money)
 
-# Funzione per la rotta '/reconvert'
+#Funzione per la rotta '/reconvert'
 @app.route("/reconvert", methods=["POST"])
 def reconvert():
     user_id = request.cookies.get('username')
@@ -396,19 +385,19 @@ def reconvert():
     value_of_chips = chips_data().get("value_of_chips", {})
     user_chips = user["user_chips"]
     
-    # Verifica che l'utente abbia delle fiches
+    #Verifica che l'utente abbia delle fiches
     if all(quantity == 0 for quantity in user_chips.values()):
         return jsonify({"error_message": "You need to have some chips to reconvert to money."})
     
     total_money = convert_back(user_chips, value_of_chips)
-    remaining_money = user["remaining_money"] + total_money  # Aggiorna remaining_money con il totale convertito
+    remaining_money = user["remaining_money"] + total_money  #Aggiorna remaining_money con il totale convertito
 
-    # Resetta i chip dell'utente a zero dopo la riconversione
+    #Resetta i chip dell'utente a zero dopo la riconversione
     for color in user_chips:
         user_chips[color] = 0
 
-    user["total_money"] = user["total_money"]  # Mantieni il totale invariato
-    user["remaining_money"] = remaining_money  # Aggiorna remaining_money con il totale convertito
+    user["total_money"] = user["total_money"]  #Mantiene il totale invariato
+    user["remaining_money"] = remaining_money  #Aggiorna remaining_money con il totale convertito
 
     save_user_data(user_data)
     
@@ -427,7 +416,7 @@ def convert_back(chips_dict, value_of_chips):
         total_money += number * chip_value
     return total_money
 
-# Funzione per la rotta '/user_dashboard'
+#Funzione per la rotta '/user_dashboard'
 @app.route("/user_dashboard")
 def user_dashboard():
     user_id = request.cookies.get('username')
@@ -453,14 +442,17 @@ def user_dashboard():
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
+    if request.cookies.get('is_admin') == 'True':
+        return redirect(url_for('admin_dashboard'))
+    
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
         
-        if verify_admin(email, password):
+        if admin_data_instance.verify_admin(email, password):
             response = make_response(redirect(url_for('admin_dashboard')))
-            response.set_cookie('admin', 'true')
             response.set_cookie('email', email)
+            response.set_cookie('is_admin', 'True')
             return response
         else:
             return render_template('admin_login.html', error_message='Invalid email or password.')
@@ -469,7 +461,7 @@ def admin_login():
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    if request.cookies.get('admin') != 'true':
+    if request.cookies.get('is_admin') != 'True':
         return redirect(url_for('admin_login'))
     
     user_data = load_user_data()
@@ -511,9 +503,7 @@ def account():
     
     if user_info:
         if user_info['is_admin']:
-            return render_template('admin_account.html', 
-                                   username=user_info['name'], 
-                                   email=email)
+            return redirect(url_for('admin_login'))
         else:
             return render_template('account.html', 
                                    username=user_info['name'], 
@@ -532,7 +522,7 @@ def delete_account():
     if email in user_data['users']:
         del user_data['users'][email]
         save_user_data(user_data)
-        response = make_response(jsonify({"success_message": "Account deleted successfully."}))
+        response = make_response(redirect(url_for('casino_home')))
         response.delete_cookie('email')
         response.delete_cookie('is_admin')
         return response
@@ -540,4 +530,5 @@ def delete_account():
         return jsonify({"error_message": "User not found."})
 
 if __name__ == '__main__':
+    create_admin_if_not_exists()
     app.run(debug=True)

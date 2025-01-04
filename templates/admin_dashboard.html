@@ -14,14 +14,13 @@
                 <th>User ID</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Balance</th>
+                <th>Remaining Balance</th>
             </tr>
             {% for user_id, user_info in users.items() %}
             <tr>
                 <td>{{ user_id }}</td>
                 <td>{{ user_info['name'] }}</td>
                 <td>{{ user_info['email'] }}</td>
-                <td>{{ user_info['total_money'] }}</td>
                 <td>{{ user_info['remaining_money'] }}</td>
             </tr>
             {% endfor %}
@@ -29,11 +28,15 @@
 
         <div class="chart-container">
             <canvas id="earningsChart"></canvas>
+            <p id="earningsChartMessage" style="display: none;">No earnings data available.</p>
         </div>
         
         <div class="chart-container">
             <canvas id="registrationsChart"></canvas>
+            <p id="registrationsChartMessage" style="display: none;">No registrations data available.</p>
         </div>
+
+        <button class="btn return-btn" onclick="window.location.href='{{ url_for('casino_home') }}';">Return to Casino Home</button>
     </div>
     
     <audio id="background-music" src="{{ url_for('static', filename='music/Jazzy Smile.mp3') }}" controls loop hidden></audio>
@@ -62,92 +65,110 @@
         fetch('{{ url_for('earnings_json') }}')
             .then(response => response.json())
             .then(data => {
-                const months = Object.keys(data);
-                const earnings = Object.values(data);
+                if (Object.keys(data).length === 0) {
+                    document.getElementById('earningsChart').style.display = 'none';
+                    document.getElementById('earningsChartMessage').style.display = 'block';
+                } else {
+                    const months = Object.keys(data);
+                    const earnings = Object.values(data);
 
-                const config = {
-                    type: 'line',
-                    data: {
-                        labels: months,
-                        datasets: [{
-                            label: 'Casino Earnings ($)',
-                            data: earnings,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderWidth: 2,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Months'
-                                }
-                            },
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: 'Earnings ($)'
+                    const config = {
+                        type: 'line',
+                        data: {
+                            labels: months,
+                            datasets: [{
+                                label: 'Casino Earnings ($)',
+                                data: earnings,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderWidth: 2,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Months'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Earnings ($)'
+                                    }
                                 }
                             }
                         }
-                    }
-                };
+                    };
 
-                const earningsChart = new Chart(
-                    document.getElementById('earningsChart'),
-                    config
-                );
+                    const earningsChart = new Chart(
+                        document.getElementById('earningsChart'),
+                        config
+                    );
+                }
             })
-            .catch(error => console.error('Error loading the JSON data:', error));
+            .catch(error => {
+                console.error('Error loading the JSON data:', error);
+                document.getElementById('earningsChart').style.display = 'none';
+                document.getElementById('earningsChartMessage').style.display = 'block';
+            });
 
         fetch('{{ url_for('registrations_json') }}')
             .then(response => response.json())
             .then(data => {
-                const months = Object.keys(data);
-                const registrations = Object.values(data);
+                if (Object.keys(data).length === 0) {
+                    document.getElementById('registrationsChart').style.display = 'none';
+                    document.getElementById('registrationsChartMessage').style.display = 'block';
+                } else {
+                    const months = Object.keys(data);
+                    const registrations = Object.values(data);
 
-                const config = {
-                    type: 'line',
-                    data: {
-                        labels: months,
-                        datasets: [{
-                            label: 'Casino Registrations',
-                            data: registrations,
-                            borderColor: 'rgba(153, 102, 255, 1)',
-                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                            borderWidth: 2,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Months'
-                                }
-                            },
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: 'Registrations'
+                    const config = {
+                        type: 'line',
+                        data: {
+                            labels: months,
+                            datasets: [{
+                                label: 'Casino Registrations',
+                                data: registrations,
+                                borderColor: 'rgba(153, 102, 255, 1)',
+                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                borderWidth: 2,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Months'
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Registrations'
+                                    }
                                 }
                             }
                         }
-                    }
-                };
+                    };
 
-                const registrationsChart = new Chart(
-                    document.getElementById('registrationsChart'),
-                    config
-                );
+                    const registrationsChart = new Chart(
+                        document.getElementById('registrationsChart'),
+                        config
+                    );
+                }
             })
-            .catch(error => console.error('Error loading the JSON data:', error));
+            .catch(error => {
+                console.error('Error loading the JSON data:', error);
+                document.getElementById('registrationsChart').style.display = 'none';
+                document.getElementById('registrationsChartMessage').style.display = 'block';
+            });
     </script>
 </body>
 </html>

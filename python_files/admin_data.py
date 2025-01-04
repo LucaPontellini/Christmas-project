@@ -1,6 +1,6 @@
 import json
-import hashlib
 import os
+import hashlib
 
 class AdminData:
     def __init__(self, admin_file_path):
@@ -15,7 +15,6 @@ class AdminData:
             return {"admin": {}}
 
     def save_admin_data(self):
-        os.makedirs(os.path.dirname(self.admin_file_path), exist_ok=True)
         with open(self.admin_file_path, 'w') as f:
             json.dump(self.admin_data, f, indent=4)
 
@@ -35,16 +34,24 @@ class AdminData:
         }
         self.save_admin_data()
 
+    def create_admin_if_not_exists(self, email, password):
+        if not os.path.exists(self.admin_file_path):
+            self.set_admin(email, password)
+            print(f"Admin credentials created: {email} / {password}")
+
+#Esempio di utilizzo dell'amministratore
 if __name__ == "__main__":
     admin_file_path = os.path.join(os.path.dirname(__file__), '../json', 'admin.json')
     admin_data = AdminData(admin_file_path)
     
+    #Inserimento delle credenziali dell'amministratore tramite il terminale
     email = input("Enter admin email: ")
     password = input("Enter admin password: ")
     
     admin_data.set_admin(email, password)
     print("Admin credentials set successfully.")
     
+    #Verifica delle credenziali dell'amministratore
     email_verifica = input("Verify - Enter admin email: ")
     password_verifica = input("Verify - Enter admin password: ")
     

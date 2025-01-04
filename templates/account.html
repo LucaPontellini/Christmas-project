@@ -8,12 +8,11 @@
 </head>
 <body>
     <div class="container">
-        <h2>Account</h2>
-        <p>Welcome, {{ username }}!</p>
+        <h2>Account Details</h2>
         <table>
             <tr>
-                <th>Attribute</th>
-                <th>Value</th>
+                <td>Name</td>
+                <td>{{ username }}</td>
             </tr>
             <tr>
                 <td>Email</td>
@@ -74,7 +73,7 @@
             <p>Are you sure you want to delete your account? This action cannot be undone.</p>
             <form id="delete-account-form" action="{{ url_for('delete_account') }}" method="post">
                 <input type="hidden" name="email" value="{{ email }}">
-                <button type="submit" class="btn delete-btn">Confirm</button>
+                <button type="submit" class="btn delete-btn">Delete</button>
                 <button type="button" class="btn cancel-btn" onclick="closeDeleteAccountModal()">Cancel</button>
             </form>
         </div>
