@@ -35,12 +35,12 @@
                     {% for chip_color, quantity in user_chips.items() %}
                     <tr>
                         <td>{{ chip_color }}</td>
-                        <td>${{ value_of_chips[chip_color] }}</td>
+                        <td>${{ value_of_chips.get(chip_color, 0) }}</td>
                         <td>{{ quantity }}</td>
-                        <td>${{ value_of_chips[chip_color] * quantity }}</td>
+                        <td>${{ value_of_chips.get(chip_color, 0) * quantity }}</td>
                     </tr>
                     {% endfor %}
-                </tbody>
+                </tbody>                
                 <tfoot>
                     <tr>
                         <td colspan="3" style="text-align: right;"><strong>Total Money:</strong></td>

@@ -7,23 +7,30 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-    <form id="login-form" action="/login" class="container" method="post">
+    <div id="error-message" class="error-message-global" style="display: none;">
+        <span id="error-text"></span>
+    </div>
+
+    <form id="login-form" action="/login" class="container" method="post" novalidate>
         <h2 style="text-align: center;"><b>Login</b></h2> <!-- Scritta Login in grassetto e centrata -->
         
         <div class="input-container">
             <img src="{{ url_for('static', filename='user_icon.png') }}" alt="User Icon" style="width:30px;height:30px;">
             <input type="email" placeholder="Email" name="email" required>
+            <div class="error-message" id="email-error"></div>
         </div>
         
         <div class="input-container">
             <img src="{{ url_for('static', filename='lock_icon.png') }}" alt="Lock Icon" style="width:30px;height:30px;">
             <input type="password" placeholder="Password" name="password" required>
+            <div class="error-message" id="password-error"></div>
         </div>
         
         {% if error_message %}
-        <div class="error-message">{{ error_message }}</div>
+        <div class="error-message-global">{{ error_message }}</div>
         {% endif %}
         
+        <button type="button" class="btn" style="margin-top: 20px;" onclick="window.location.href='{{ url_for('register') }}'">Register</button>
         <button type="submit" class="btn">Login</button>
         <a href="{{ url_for('forgot_password') }}" class="forgot-password-link">Forgot password?</a><br>
 
@@ -40,17 +47,20 @@
             inputs.forEach(function(input) {
                 if (!input.value) {
                     input.setCustomValidity('Please fill out this field.');
+                    input.classList.add('error');
+                    showErrorMessage('Please fill out this field.', input);
                 } else {
                     input.setCustomValidity('');
+                    input.classList.remove('error');
                 }
             });
 
             var emailInput = form.querySelector('input[type="email"]');
             emailInput.addEventListener('invalid', function(event) {
                 if (emailInput.validity.typeMismatch) {
-                    emailInput.setCustomValidity('Please enter a valid email address.');
+                    showErrorMessage('Please include an "@" in the email address. The email address is missing an "@".', emailInput);
                 } else if (emailInput.validity.valueMissing) {
-                    emailInput.setCustomValidity('Please fill out this field.');
+                    showErrorMessage('Please fill out this field.', emailInput);
                 } else {
                     emailInput.setCustomValidity('');
                 }
@@ -75,7 +85,7 @@
         window.addEventListener('load', playBackgroundMusic);
 
         // Imposta i messaggi di errore personalizzati in inglese
-        document.querySelectorAll('input[required]').forEach(function(input) {
+        document.querySelectorAll('input[required], select[required]').forEach(function(input) {
             input.addEventListener('invalid', function(event) {
                 event.target.setCustomValidity('Please fill out this field.');
             });
@@ -84,6 +94,17 @@
                 event.target.setCustomValidity('');
             });
         });
+
+        // Funzione per mostrare il messaggio di errore
+        function showErrorMessage(message, input) {
+            var errorMessage = document.getElementById('error-message');
+            var errorText = document.getElementById('error-text');
+            errorText.innerHTML = message;
+            errorMessage.style.display = 'block';
+            setTimeout(function() {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
     </script>
 </body>
 </html>

@@ -91,3 +91,29 @@ audio#background-music {
     transform: translateY(2px);
     box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
 }
+
+.btn.logout-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(45deg, #ff6347, #ff4500);
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn.logout-btn:hover {
+    background: linear-gradient(45deg, #ff4500, #ff6347);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn.logout-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.2);
+}

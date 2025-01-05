@@ -28,7 +28,7 @@
                     <th>Password</th>
                     <td>
                         <div class="input-container large-input">
-                            <input type="password" id="password" value="{{ user_data['password'] }}" readonly>
+                            <input type="text" id="password" value="{{ password }}" readonly>
                             <img src="{{ url_for('static', filename='eye_closed.jpeg') }}" alt="Toggle Visibility" class="toggle-password" onclick="toggleVisibility('password', this)">
                         </div>
                     </td>
@@ -37,7 +37,7 @@
                     <th>Payment Method</th>
                     <td>
                         <div class="input-container large-input">
-                            <input type="password" id="payment-method" value="{{ user_data['payment_method'] }}" readonly>
+                            <input type="password" id="payment-method" value="{{ payment_method }}" readonly>
                             <img src="{{ url_for('static', filename='eye_closed.jpeg') }}" alt="Toggle Visibility" class="toggle-password" onclick="toggleVisibility('payment-method', this)">
                         </div>
                     </td>
@@ -147,10 +147,10 @@
             var input = document.getElementById(id);
             if (input.type === "password") {
                 input.type = "text";
-                element.src = "{{ url_for('static', filename='eye_open.jpeg') }}";
+                element.src = "{{ url_for('static', filename='eye_closed.jpeg') }}";
             } else {
                 input.type = "password";
-                element.src = "{{ url_for('static', filename='eye_closed.jpeg') }}";
+                element.src = "{{ url_for('static', filename='eye_open.jpeg') }}";
             }
         }
     </script>
