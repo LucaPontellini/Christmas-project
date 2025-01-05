@@ -1,5 +1,4 @@
-tabulate
-matplotlib
 Flask==2.0.1
 requests
-flask_mail
+tabulate
+matplotlib
