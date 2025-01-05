@@ -45,6 +45,6 @@ The **Christmas-Project** integrates seamlessly with another existing project, [
 
 1. Start the Flask application:
     ```bash
-    python app.py
+    python casino.py
 
 2. Open your web browser and navigate to http://localhost:5000 to access the application
