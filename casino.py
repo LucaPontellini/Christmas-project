@@ -160,11 +160,11 @@ def register():
                 'purple': 0,
                 'yellow': 0,
                 'pink': 0,
-                'light_blue': 0
+                'light blue': 0
             },
             'total_money': 0,
             'remaining_money': 0,
-            'registration_date': datetime.now().strftime('%Y-%m-%d')
+            'registration_date': datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         }
         
         save_user_data(user_data)
@@ -311,6 +311,10 @@ def convert_to_chips():
         
         if total_cost > user["remaining_money"]:
             return jsonify({"error_message": "Insufficient funds."})
+        
+        # Controlla se il colore delle fiches è presente nel dizionario user_chips
+        if chip_color not in user["user_chips"]:
+            return jsonify({"error_message": "Chip color not found in user data."})
     
     except KeyError:
         return jsonify({"error_message": "Please enter a valid amount and select a chip color."})
@@ -329,30 +333,6 @@ def convert_to_chips():
         "remaining_money": user["remaining_money"]
     })
 
-@app.route('/home_poker')
-def home_poker():
-    return render_template('home_poker.html')
-
-@app.route('/play')
-def play():
-    email = request.cookies.get('email')
-    logging.debug(f"play: email={email}")
-    
-    if not email:
-        error_message = "You need to be logged in to play."
-        redirect_url = url_for('register')
-        return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
-    
-    user_data = load_user_data()
-    user = user_data['users'].get(email)
-    
-    if not user:
-        error_message = "User not found."
-        redirect_url = url_for('register')
-        return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
-    
-    return render_template('play.html', user=user)
-
 @app.route("/update_total_money", methods=["POST"])
 def update_total_money():
     email = request.cookies.get('email')
@@ -368,10 +348,12 @@ def update_total_money():
         return jsonify({"error_message": "User not found."})
     
     payment_method = request.form.get('payment_method')
+    logging.debug(f"update_total_money: payment_method={payment_method}")
     if not payment_method:
         return jsonify({"error_message": "Please select a payment method."})
     
     new_total_money_str = request.form.get("total_money", "")
+    logging.debug(f"update_total_money: new_total_money_str={new_total_money_str}")
     if not new_total_money_str.strip():
         return jsonify({"error_message": "Please enter a valid amount."})
     
@@ -444,7 +426,6 @@ def clear_all_data():
         "remaining_money": user["remaining_money"]
     })
 
-# Funzione per la rotta '/reconvert'
 @app.route("/reconvert", methods=["POST"])
 def reconvert():
     email = request.cookies.get('email')
@@ -464,7 +445,7 @@ def reconvert():
     
     # Verifica che l'utente abbia delle fiches
     if all(quantity == 0 for quantity in user_chips.values()):
-        return jsonify({"error_message": "You need to have some chips to reconvert to money."})
+        return jsonify({"error_message": "There is no data to reconvert."})
     
     total_money = convert_back(user_chips, value_of_chips)
     remaining_money = user["remaining_money"] + total_money  # Aggiorna remaining_money con il totale convertito
@@ -492,6 +473,30 @@ def convert_back(chips_dict, value_of_chips):
         chip_value = int(value_of_chips[color])
         total_money += number * chip_value
     return total_money
+
+@app.route('/home_poker')
+def home_poker():
+    return render_template('home_poker.html')
+
+@app.route('/play')
+def play():
+    email = request.cookies.get('email')
+    logging.debug(f"play: email={email}")
+    
+    if not email:
+        error_message = "You need to be logged in to play."
+        redirect_url = url_for('register')
+        return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
+    
+    user_data = load_user_data()
+    user = user_data['users'].get(email)
+    
+    if not user:
+        error_message = "User not found."
+        redirect_url = url_for('register')
+        return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
+    
+    return render_template('play.html', user=user)
 
 @app.route('/user_dashboard')
 def user_dashboard():
@@ -608,7 +613,7 @@ def delete_account():
     deleted_user_data = load_deleted_user_data()
     
     if email in user_data['users']:
-        user_data['users'][email]['deletion_date'] = datetime.now().strftime('%Y-%m-%d')
+        user_data['users'][email]['deletion_date'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         
         # Sposta l'utente eliminato nel file deleted_users.json
         deleted_user_data['users'][email] = user_data['users'][email]

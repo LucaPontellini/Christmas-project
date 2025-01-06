@@ -102,7 +102,8 @@
                         <option value="yellow">yellow</option>
                         <option value="pink">pink</option>
                         <option value="light blue">light blue</option>
-                    </select><br>
+                    </select>
+                    <br>
                     <input type="submit" value="Convert">
                 </form>
             </section>
@@ -155,10 +156,10 @@
     <!-- Script JavaScript per il controllo della musica e dei messaggi di errore -->
     <script>
         setTimeout(function() {
-            var errorMessage = document.querySelector('.error-message');
-            if (errorMessage) {
-                errorMessage.style.display = 'none';
-            }
+        var errorMessage = document.querySelector('.error-message');
+        if (errorMessage) {
+            errorMessage.style.display = 'none';
+        }
         }, 5000);
 
         // Funzione per avviare la musica
@@ -183,6 +184,7 @@
         function handleFormSubmit(event, form) {
             event.preventDefault();
             var formData = new FormData(form);
+            console.log("Form data:", formData); // Aggiungi questa riga per il debug
             fetch(form.action, {
                 method: form.method,
                 body: formData
@@ -222,6 +224,11 @@
             }, 5000);
         }
 
+        // Funzione per formattare i numeri con separatori di migliaia
+        function formatNumber(num) {
+            return num.toLocaleString('en-US');
+        }
+
         // Funzione per aggiornare le tabelle con i nuovi dati
         function updateTables(data) {
             // Aggiorna la tabella dei colori delle fiches
@@ -230,15 +237,35 @@
             for (var i = 0; i < chipColors.length; i++) {
                 var chipColor = chipColors[i];
                 var valueCell = chipTableBody.querySelector('tr:nth-child(' + (i + 1) + ') td:nth-child(2)');
-                valueCell.textContent = '$' + data.value_of_chips[chipColor];
+                valueCell.textContent = '$' + formatNumber(data.value_of_chips[chipColor]);
             }
 
             // Aggiorna la tabella del denaro totale e rimanente
             var totalMoneyCell = document.getElementById('total-money');
-            totalMoneyCell.textContent = '$' + data.total_money;
+            totalMoneyCell.textContent = '$' + formatNumber(data.total_money);
             var remainingMoneyCell = document.getElementById('remaining-money');
-            remainingMoneyCell.textContent = '$' + data.remaining_money;
+            remainingMoneyCell.textContent = '$' + formatNumber(data.remaining_money);
         }
+
+        // Chiama la funzione updateTables quando la pagina viene caricata
+        window.addEventListener('load', function() {
+            var data = {
+                value_of_chips: {
+                    'white': 1,
+                    'red': 5,
+                    'blue': 10,
+                    'green': 25,
+                    'black': 100,
+                    'purple': 500,
+                    'yellow': 1000,
+                    'pink': 5000,
+                    'light blue': 10000
+                },
+                total_money: {{ total_money }},
+                remaining_money: {{ remaining_money }}
+            };
+            updateTables(data);
+        });
     </script>
 </body>
 </html>

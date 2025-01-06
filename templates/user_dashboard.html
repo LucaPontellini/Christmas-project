@@ -31,7 +31,7 @@
                         <th>Total Value</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="chip-table-body">
                     {% for chip_color, quantity in user_chips.items() %}
                     <tr>
                         <td>{{ chip_color }}</td>
@@ -44,11 +44,11 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" style="text-align: right;"><strong>Total Money:</strong></td>
-                        <td>${{ total_money }}</td>
+                        <td id="total-money">${{ total_money }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" style="text-align: right;"><strong>Remaining Money:</strong></td>
-                        <td>{% if remaining_money is defined and remaining_money != 0 %}${{ remaining_money }}{% else %}$0{% endif %}</td>
+                        <td id="remaining-money">{% if remaining_money is defined and remaining_money != 0 %}${{ remaining_money }}{% else %}$0{% endif %}</td>
                     </tr>
                 </tfoot>
             </table>
@@ -65,8 +65,15 @@
         </main>
     </div>
 
-    <!-- Script JavaScript per il controllo della musica -->
+    <!-- Script JavaScript per il controllo della musica e dei messaggi di errore -->
     <script>
+        setTimeout(function() {
+            var errorMessage = document.querySelector('.error-message');
+            if (errorMessage) {
+                errorMessage.style.display = 'none';
+            }
+        }, 5000);
+
         // Funzione per avviare la musica
         function playBackgroundMusic() {
             var backgroundMusic = document.getElementById('background-music');
@@ -99,7 +106,7 @@
                     showErrorMessage(data.error_message);
                 } else {
                     // Aggiorna la pagina con i nuovi dati
-                    location.reload();
+                    updateTables(data);
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -120,7 +127,7 @@
                     showErrorMessage(data.error_message);
                 } else {
                     // Aggiorna la pagina con i nuovi dati
-                    location.reload();
+                    updateTables(data);
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -137,6 +144,65 @@
                 errorMessage.style.display = 'none';
             }, 5000);
         }
+
+        // Funzione per formattare i numeri con separatori di migliaia
+        function formatNumber(num) {
+            return num.toLocaleString('en-US'); // Utilizza 'en-US' per il formato americano
+        }
+
+        // Funzione per aggiornare le tabelle con i nuovi dati
+        function updateTables(data) {
+            // Aggiorna la tabella dei colori delle fiches
+            var chipTableBody = document.getElementById('chip-table-body');
+            var chipColors = ["white", "red", "blue", "green", "black", "purple", "yellow", "pink", "light blue"];
+            for (var i = 0; i < chipColors.length; i++) {
+                var chipColor = chipColors[i];
+                var row = chipTableBody.querySelector('tr:nth-child(' + (i + 1) + ')');
+                var valueCell = row.querySelector('td:nth-child(2)');
+                var quantityCell = row.querySelector('td:nth-child(3)');
+                var totalValueCell = row.querySelector('td:nth-child(4)');
+                valueCell.textContent = '$' + formatNumber(data.value_of_chips[chipColor]);
+                quantityCell.textContent = formatNumber(data.user_chips[chipColor] || 0);
+                totalValueCell.textContent = '$' + formatNumber(data.value_of_chips[chipColor] * (data.user_chips[chipColor] || 0));
+            }
+
+            // Aggiorna la tabella del denaro totale e rimanente
+            var totalMoneyCell = document.getElementById('total-money');
+            totalMoneyCell.textContent = '$' + formatNumber(data.total_money);
+            var remainingMoneyCell = document.getElementById('remaining-money');
+            remainingMoneyCell.textContent = '$' + formatNumber(data.remaining_money);
+        }
+
+        // Chiama la funzione updateTables quando la pagina viene caricata
+        window.addEventListener('load', function() {
+            var data = {
+                value_of_chips: {
+                    'white': 1,
+                    'red': 5,
+                    'blue': 10,
+                    'green': 25,
+                    'black': 100,
+                    'purple': 500,
+                    'yellow': 1000,
+                    'pink': 5000,
+                    'light blue': 10000
+                },
+                user_chips: {
+                    'white': 0,
+                    'red': 0,
+                    'blue': 0,
+                    'green': 0,
+                    'black': 0,
+                    'purple': 0,
+                    'yellow': 0,
+                    'pink': 0,
+                    'light blue': 0
+                },
+                total_money: {{ total_money }},
+                remaining_money: {{ remaining_money }}
+            };
+            updateTables(data);
+        });
     </script>
 </body>
 </html>

@@ -9,11 +9,14 @@ body {
 .content-wrapper {
     position: relative;
     z-index: 1;
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
     background-color: rgba(255, 255, 255, 0.9); /* Aggiungi uno sfondo opaco */
     border-radius: 10px; /* Aggiungi bordi arrotondati */
+    overflow: hidden; /* Aggiungi questa proprietà */
+    word-wrap: break-word; /* Aggiungi questa proprietà */
+    min-height: 600px; /* Aggiungi questa proprietà per aumentare l'altezza del rettangolo */
 }
 
 .overlay {
@@ -36,10 +39,19 @@ th, td {
     padding: 10px;
     border: 1px solid black;
     text-align: center;
+    word-wrap: break-word; /* Aggiungi questa proprietà */
+}
+
+th:nth-child(6), td:nth-child(6) {
+    width: 200px; /* Imposta una larghezza maggiore per la colonna della data di registrazione */
+    white-space: nowrap; /* Impedisce la rottura del testo */
+    overflow: hidden; /* Nasconde il testo che trabocca */
+    text-overflow: ellipsis; /* Aggiunge i puntini di sospensione per il testo che trabocca */
 }
 
 .chart-container {
     margin-bottom: 20px;
+    height: 500px; /* Aumenta l'altezza del contenitore del grafico */
 }
 
 h1 {

@@ -123,7 +123,7 @@
                         console.log('Active user data:', activeData); // Messaggio di debug
     
                         // Combine active and deleted user data
-                        const combinedData = { ...deletedData.users, ...activeData.users };
+                        const combinedData = { ...activeData.users, ...deletedData.users };
     
                         for (const email in combinedData) {
                             const userInfo = combinedData[email];
@@ -138,7 +138,9 @@
                             }
     
                             earningsData[month] += userInfo.total_money;
-                            registrationsData[month] += 1;
+                            if (!userInfo.deletion_date) { // Escludi gli utenti eliminati dal conteggio delle registrazioni
+                                registrationsData[month] += 1;
+                            }
                         }
     
                         console.log('Earnings data:', earningsData); // Messaggio di debug
@@ -169,7 +171,8 @@
                         borderColor: borderColor,
                         backgroundColor: backgroundColor,
                         borderWidth: 2,
-                        fill: true
+                        fill: false, // Imposta fill a false per non riempire l'area sotto la linea
+                        tension: 0.4 // Aggiungi questa proprietà per rendere la linea più fluida
                     }]
                 },
                 options: {
@@ -230,4 +233,4 @@
         }
     </script>            
 </body>
-</html> 
+</html>
