@@ -45,5 +45,3 @@ The Christmas-Project integrates seamlessly with another existing project, [Pont
 2. Open your web browser and navigate to [http://localhost:5000](http://localhost:5000) to access the application.
 
 You can find all the details in the [Christmas_Project.md](https://github.com/LucaPontellini/Christmas-project/blob/main/Christmas_Project.md) file.
-
-You can find all the details in the [Christmas_Project.md](https://github.com/LucaPontellini/Christmas-project/blob/main/Christmas_Project.md) file.
