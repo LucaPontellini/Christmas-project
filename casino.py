@@ -6,10 +6,10 @@ import hashlib
 import logging
 from datetime import datetime
 
-# Configura il logging
+#Configura il logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Percorso relativo alla directory python_files
+#Percorso relativo alla directory python_files
 sys.path.append(os.path.join(os.path.dirname(__file__), 'python_files'))
 
 from user_data import UserData
@@ -22,16 +22,16 @@ app = Flask(__name__)
 #Variabile temporanea per memorizzare la password in chiaro
 temporary_password = None
 
-# Percorso del file JSON degli utenti
+#Percorso del file JSON degli utenti
 user_file_path = os.path.join(os.path.dirname(__file__), 'json', 'users.json')
 
-# Percorso del file JSON del mazzo di carte
+#Percorso del file JSON del mazzo di carte
 deck_file_path = os.path.join(os.path.dirname(__file__), 'json', 'deck_into_json.json')
 
-# Percorso del file JSON degli amministratori
+#Percorso del file JSON degli amministratori
 admin_file_path = os.path.join(os.path.dirname(__file__), 'json', 'admin.json')
 
-# Percorso del file JSON degli account eliminati
+#Percorso del file JSON degli account eliminati
 deleted_users_file_path = os.path.join(os.path.dirname(__file__), 'json', 'deleted_users.json')
 
 user_data = UserData(user_file_path)
@@ -39,18 +39,30 @@ deck_data = DeckData(deck_file_path)
 admin_data_instance = AdminData(admin_file_path)
 password_manager = PasswordManager(user_file_path)
 
+#Funzione per caricare i dati degli utenti dal file JSON
 def load_user_data():
+    
+    """Carica i dati degli utenti dal file JSON."""
+
     try:
         with open(user_file_path, 'r') as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return {"users": {}}
 
+#Funzione per salvare i dati degli utenti nel file JSON
 def save_user_data(data):
+    
+    """Salva i dati degli utenti nel file JSON."""
+
     with open(user_file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
+#Funzione per caricare la password in chiaro dal file JSON separato
 def load_plain_password(email):
+    
+    """Carica la password in chiaro dal file JSON separato."""
+
     json_path = os.path.join('json', 'plain_passwords.json')
     if not os.path.exists(json_path):
         with open(json_path, 'w') as file:
@@ -62,8 +74,11 @@ def load_plain_password(email):
             plain_passwords = {}
     return plain_passwords.get(email)
 
-# Funzione per salvare la password in chiaro in un file JSON separato
+#Funzione per salvare la password in chiaro in un file JSON separato
 def save_plain_password(email, password):
+    
+    """Salva la password in chiaro nel file JSON separato."""
+
     json_path = os.path.join('json', 'plain_passwords.json')
     if not os.path.exists(json_path):
         with open(json_path, 'w') as file:
@@ -77,22 +92,42 @@ def save_plain_password(email, password):
     with open(json_path, 'w') as file:
         json.dump(plain_passwords, file, indent=4)
 
+#Funzione per generare un hash della password utilizzando SHA-256
 def hash_password(password):
+    
+    """Genera un hash della password utilizzando SHA-256."""
+
     return hashlib.sha256(password.encode()).hexdigest()
 
+#Funzione per creare un account amministratore se non esiste già
 def create_admin_if_not_exists():
+    
+    """Crea un account amministratore se non esiste già."""
+
     admin_data_instance.create_admin_if_not_exists('admin@lucapontellini.com', 'Gp!7fhD^*3nVq9E')
 
+#Funzione per caricare i dati dell'amministratore dal file JSON
 def load_admin_data():
+    
+    """Carica i dati dell'amministratore dal file JSON."""
+
     with open('json/admin.json', 'r') as file:
         return json.load(file)
 
+#Funzione per verificare le credenziali dell'amministratore
 def verify_admin(email, password):
+    
+    """Verifica le credenziali dell'amministratore."""
+
     admin_data = load_admin_data()
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     return email == admin_data['admin']['email'] and hashed_password == admin_data['admin']['password']
 
+#Funzione per caricare i dati degli utenti eliminati dal file JSON
 def load_deleted_user_data():
+
+    """Carica i dati degli utenti eliminati dal file JSON."""
+
     json_path = os.path.join('json', 'deleted_users.json')
     if not os.path.exists(json_path):
         with open(json_path, 'w') as file:
@@ -103,21 +138,34 @@ def load_deleted_user_data():
     except json.JSONDecodeError:
         return {"users": {}}
 
+#Funzione per salvare i dati degli utenti eliminati nel file JSON
 def save_deleted_user_data(data):
+
+    """Salva i dati degli utenti eliminati nel file JSON."""
+
     json_path = os.path.join('json', 'deleted_users.json')
     with open(json_path, 'w') as file:
         json.dump(data, file, indent=4)
 
 @app.route('/')
 def welcome():
+
+    """Rende la pagina di benvenuto."""
+
     return render_template('welcome.html')
 
 @app.route('/return_to_welcome')
 def return_to_welcome():
+
+    """Reindirizza alla pagina di benvenuto."""
+
     return redirect(url_for('welcome'))
 
 @app.route('/casino_home')
 def casino_home():
+
+    """Rende la pagina principale del casinò."""
+
     email = request.cookies.get('email')
     is_admin = request.cookies.get('is_admin')
     logging.debug(f"casino_home: email={email}, is_admin={is_admin}")
@@ -125,10 +173,16 @@ def casino_home():
 
 @app.route('/return_to_casino_home')
 def return_to_casino_home():
+
+    """Reindirizza alla pagina principale del casinò."""
+
     return redirect(url_for('casino_home'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+
+    """Gestisce la registrazione di un nuovo utente."""
+
     global temporary_password
     if request.method == 'POST':
         email = request.form.get('email')
@@ -143,7 +197,7 @@ def register():
         if email in user_data['users']:
             return jsonify({'error_message': 'Email already registered. Please log in.'})
         
-        # Hash della password
+        #Hash della password
         password_hash = hashlib.sha256(password.encode()).hexdigest()
         
         user_data['users'][email] = {
@@ -168,7 +222,7 @@ def register():
         }
         
         save_user_data(user_data)
-        # Salva la password in chiaro nel file JSON separato
+        #Salva la password in chiaro nel file JSON separato
         save_plain_password(email, password)
         response = make_response(jsonify({'redirect_url': url_for('casino_home')}))
         response.set_cookie('email', email)
@@ -179,6 +233,9 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+
+    """Gestisce il login degli utenti."""
+
     global temporary_password
     if request.method == 'POST':
         email = request.form.get('email')
@@ -187,6 +244,7 @@ def login():
         if not email or not password:
             return render_template('login.html', error_message='Email and password are required.')
 
+        #Carica i dati degli utenti
         user_data = load_user_data()
         user = user_data['users'].get(email)
         
@@ -207,6 +265,9 @@ def login():
 
 @app.route('/logout')
 def logout():
+
+    """Gestisce il logout degli utenti."""
+
     response = make_response(redirect(url_for('welcome')))
     response.delete_cookie('email')
     response.delete_cookie('is_admin')
@@ -214,6 +275,9 @@ def logout():
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
+
+    """Gestisce la richiesta di reset della password."""
+
     if request.method == 'POST':
         email = request.form['email']
         user_data = load_user_data()
@@ -230,6 +294,9 @@ def forgot_password():
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
+
+    """Gestisce il reset della password tramite token."""
+
     if request.method == 'POST':
         new_password = request.form['new_password']
         email = password_manager.verify_reset_token(token)
@@ -239,7 +306,7 @@ def reset_password(token):
                 user_data['users'][email]['password'] = hash_password(new_password)
                 save_user_data(user_data)
                 
-                # Aggiorna anche il file JSON con le password in chiaro
+                #Aggiorna anche il file JSON con le password in chiaro
                 save_plain_password(email, new_password)
                 
                 logging.debug(f"Password reset for {email}")
@@ -250,16 +317,23 @@ def reset_password(token):
 
 @app.route('/poker_rules')
 def poker_rules():
+
+    """Rende la pagina delle regole del poker."""
+
     return render_template('poker_rules.html')
 
 @app.route('/cashier_dashboard', methods=['GET', 'POST'])
 def cashier_dashboard():
+
+    """Rende la pagina del dashboard del cassiere."""
+
     email = request.cookies.get('email')
     logging.debug(f"cashier_dashboard: email={email}")
     
     if not email: 
         return redirect(url_for('register'))
     
+    #Carica i dati degli utenti
     user_data = load_user_data()
     user = user_data['users'].get(email)
     
@@ -282,12 +356,16 @@ def cashier_dashboard():
 
 @app.route('/convert_to_chips', methods=['POST'])
 def convert_to_chips():
+
+    """Converte denaro in fiches."""
+
     email = request.cookies.get('email')
     logging.debug(f"convert_to_chips: email={email}")
     
     if not email:
         return jsonify({"error_message": "User not authenticated."})
     
+    #Carica i dati degli utenti
     user_data = load_user_data()
     user = user_data['users'].get(email)
     
@@ -312,7 +390,7 @@ def convert_to_chips():
         if total_cost > user["remaining_money"]:
             return jsonify({"error_message": "Insufficient funds."})
         
-        # Controlla se il colore delle fiches è presente nel dizionario user_chips
+        #Controlla se il colore delle fiches è presente nel dizionario user_chips
         if chip_color not in user["user_chips"]:
             return jsonify({"error_message": "Chip color not found in user data."})
     
@@ -335,12 +413,16 @@ def convert_to_chips():
 
 @app.route("/update_total_money", methods=["POST"])
 def update_total_money():
+
+    """Aggiorna il totale del denaro dell'utente."""
+
     email = request.cookies.get('email')
     logging.debug(f"update_total_money: email={email}")
     
     if not email:
         return jsonify({"error_message": "User not authenticated."})
     
+    #Carica i dati degli utenti
     user_data = load_user_data()
     user = user_data['users'].get(email)
     
@@ -377,32 +459,36 @@ def update_total_money():
 
 @app.route("/clear_all_data", methods=["POST"])
 def clear_all_data():
+
+    """Cancella tutti i dati dell'utente."""
+
     email = request.cookies.get('email')
     logging.debug(f"clear_all_data: email={email}")
     
     if not email:
         return jsonify({"error_message": "User not authenticated."})
     
+    #Carica i dati degli utenti
     user_data = load_user_data()
     user = user_data['users'].get(email)
     
     if not user:
         return jsonify({"error_message": "User not found."})
     
-    # Verifica se il denaro totale è zero
+    #Verifica se il denaro totale è zero
     total_money_is_zero = user["total_money"] == 0
     
-    # Verifica se il denaro rimanente è zero
+    #Verifica se il denaro rimanente è zero
     remaining_money_is_zero = user["remaining_money"] == 0
     
-    # Verifica se tutte le quantità di fiches sono zero
+    #Verifica se tutte le quantità di fiches sono zero
     all_chips_are_zero = all(quantity == 0 for quantity in user["user_chips"].values())
     
-    # Se tutte le condizioni sono vere, non c'è nulla da eliminare
+    #Se tutte le condizioni sono vere, non c'è nulla da eliminare
     if total_money_is_zero and remaining_money_is_zero and all_chips_are_zero:
         return jsonify({"error_message": "There is no data to clear."})
     
-    # Procedi con la cancellazione dei dati
+    #Procedi con la cancellazione dei dati
     user["user_chips"] = {
         "white": 0,
         "red": 0,
@@ -428,12 +514,16 @@ def clear_all_data():
 
 @app.route("/reconvert", methods=["POST"])
 def reconvert():
+
+    """Riconverte le fiches in denaro."""
+
     email = request.cookies.get('email')
     logging.debug(f"reconvert: email={email}")
     
     if not email:
         return jsonify({"error_message": "User not authenticated."})
     
+    #Carica i dati degli utenti
     user_data = load_user_data()
     user = user_data['users'].get(email)
     
@@ -443,19 +533,19 @@ def reconvert():
     value_of_chips = chips_data().get("value_of_chips", {})
     user_chips = user["user_chips"]
     
-    # Verifica che l'utente abbia delle fiches
+    #Verifica che l'utente abbia delle fiches
     if all(quantity == 0 for quantity in user_chips.values()):
         return jsonify({"error_message": "There is no data to reconvert."})
     
     total_money = convert_back(user_chips, value_of_chips)
-    remaining_money = user["remaining_money"] + total_money  # Aggiorna remaining_money con il totale convertito
+    remaining_money = user["remaining_money"] + total_money  #Aggiorna remaining_money con il totale convertito
 
-    # Resetta i chip dell'utente a zero dopo la riconversione
+    #Resetta i chip dell'utente a zero dopo la riconversione
     for color in user_chips:
         user_chips[color] = 0
 
-    user["total_money"] = user["total_money"]  # Mantiene il totale invariato
-    user["remaining_money"] = remaining_money  # Aggiorna remaining_money con il totale convertito
+    user["total_money"] = user["total_money"]  #Mantiene il totale invariato
+    user["remaining_money"] = remaining_money  #Aggiorna remaining_money con il totale convertito
 
     save_user_data(user_data)
     
@@ -466,8 +556,11 @@ def reconvert():
         "remaining_money": user["remaining_money"]
     })
 
+# Funzione per convertire le fiches in denaro
 def convert_back(chips_dict, value_of_chips):
-    """This function converts chips back to money"""
+
+    """Converte le fiches in denaro."""
+
     total_money = 0
     for color, number in chips_dict.items():
         chip_value = int(value_of_chips[color])
@@ -476,10 +569,16 @@ def convert_back(chips_dict, value_of_chips):
 
 @app.route('/home_poker')
 def home_poker():
+
+    """Rende la pagina principale del poker."""
+
     return render_template('home_poker.html')
 
 @app.route('/play')
 def play():
+
+    """Rende la pagina di gioco del poker."""
+
     email = request.cookies.get('email')
     logging.debug(f"play: email={email}")
     
@@ -488,6 +587,7 @@ def play():
         redirect_url = url_for('register')
         return render_template('home_poker.html', error_message=error_message, redirect_url=redirect_url)
     
+    #Carica i dati degli utenti
     user_data = load_user_data()
     user = user_data['users'].get(email)
     
@@ -500,12 +600,16 @@ def play():
 
 @app.route('/user_dashboard')
 def user_dashboard():
+
+    """Rende il dashboard dell'utente."""
+
     email = request.cookies.get('email')
     logging.debug(f"user_dashboard: email={email}")
     
     if not email:
         return redirect(url_for('login'))
     
+    #Carica i dati degli utenti
     user_data = load_user_data()
     user_info = user_data['users'].get(email)
     
@@ -525,13 +629,20 @@ def user_dashboard():
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
+
+    """Reindirizza alla pagina di login per gli amministratori."""
+
     return redirect(url_for('login'))
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
+
+    """Rende il dashboard degli amministratori."""
+
     if request.cookies.get('is_admin') != 'True':
         return redirect(url_for('admin_login'))
     
+    #Carica i dati degli utenti
     user_data = load_user_data()
     users = user_data['users']
     
@@ -539,10 +650,14 @@ def admin_dashboard():
 
 @app.route('/earnings')
 def earnings():
+
+    """Restituisce i guadagni mensili degli utenti non amministratori."""
+
+    #Carica i dati degli utenti
     user_data = load_user_data()
     earnings = {}
     for user_id, user_info in user_data['users'].items():
-        if not user_info['is_admin']:  # Gli amministratori sono esclusi dal conteggio delle registrazioni
+        if not user_info['is_admin']:  #Gli amministratori sono esclusi dal conteggio delle registrazioni
             for transaction in user_info.get('transactions', []):
                 date = transaction['date']
                 month = date.split('-')[1]
@@ -554,10 +669,14 @@ def earnings():
 
 @app.route('/registrations')
 def registrations():
+
+    """Restituisce i dati delle registrazioni mensili degli utenti."""
+
+    #Carica i dati degli utenti
     user_data = load_user_data()
     registrations = {}
     for user_id, user_info in user_data['users'].items():
-        if not user_info['is_admin']:  # Gli amministratori sono esclusi dal conteggio delle registrazioni
+        if not user_info['is_admin']:  #Gli amministratori sono esclusi dal conteggio delle registrazioni
             registration_date = user_info.get('registration_date')
             if registration_date:
                 month = registration_date.split('-')[1]
@@ -569,10 +688,14 @@ def registrations():
 
 @app.route('/account')
 def account():
+
+    """Rende la pagina dell'account dell'utente."""
+
     email = request.cookies.get('email')
     if not email:
         return redirect(url_for('login'))
 
+    #Carica i dati degli utenti
     user_data = load_user_data()
     user = user_data['users'].get(email)
     if not user:
@@ -580,16 +703,16 @@ def account():
 
     user_chips = user.get('user_chips', {})
 
-    # Verifica se il file plain_passwords.json esiste e non è vuoto
+    #Verifica se il file plain_passwords.json esiste e non è vuoto
     json_path = os.path.join('json', 'plain_passwords.json')
     if not os.path.exists(json_path):
         with open(json_path, 'w') as file:
             json.dump({}, file)
 
-    # Recupera la password in chiaro
+    #Recupera la password in chiaro
     password = load_plain_password(email)
 
-    # Imposta il metodo di pagamento su "None" se non è presente
+    #Imposta il metodo di pagamento su "None" se non è presente
     payment_method = user.get('payment_method', 'None')
 
     return render_template(
@@ -606,23 +729,27 @@ def account():
 
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
+
+    """Elimina l'account dell'utente."""
+
     email = request.form.get('email')
     logging.debug(f"delete_account: email={email}")
     
+    #Carica i dati degli utenti
     user_data = load_user_data()
     deleted_user_data = load_deleted_user_data()
     
     if email in user_data['users']:
         user_data['users'][email]['deletion_date'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         
-        # Sposta l'utente eliminato nel file deleted_users.json
+        #Sposta l'utente eliminato nel file deleted_users.json
         deleted_user_data['users'][email] = user_data['users'][email]
         del user_data['users'][email]
         
         save_user_data(user_data)
         save_deleted_user_data(deleted_user_data)
         
-        # Aggiornamento del file JSON con le password in chiaro
+        #Aggiornamento del file JSON con le password in chiaro
         try:
             with open(os.path.join('json', 'plain_passwords.json'), 'r') as file:
                 plain_passwords = json.load(file)
@@ -644,6 +771,9 @@ def delete_account():
 
 @app.route('/json/<path:filename>')
 def serve_json(filename):
+
+    """Serve il file JSON richiesto."""
+    
     return send_from_directory('json', filename)
 
 if __name__ == '__main__':
