@@ -46,3 +46,6 @@ The Christmas-Project integrates seamlessly with another existing project, [Pont
 
 You can find all the details in the [Christmas_Project.md](https://github.com/LucaPontellini/Christmas-project/blob/main/Christmas_Project.md) file.
 
+### 📁 Project Structure
+
+For a detailed view of the project structure, see: [PROJECT_STRUCTURE.md](https://github.com/LucaPontellini/Christmas-project/blob/6fe3d96c0b9fc99a1ed1d9ff58edc643663b1dc4/PROJECT_STRUCTURE.md)
